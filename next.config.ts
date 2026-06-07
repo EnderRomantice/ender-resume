@@ -1,7 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  images: {
+    // The Creatorone logo is an SVG served from /public.
+    dangerouslyAllowSVG: true,
+    contentDispositionType: "inline",
+  },
 };
 
 export default nextConfig;
