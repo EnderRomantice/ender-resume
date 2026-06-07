@@ -14,6 +14,7 @@ export default function GlobalLanyard() {
         frontImage="/card-front.png"
         backImage="/logos/creatorone-tile.png"
         lanyardWidth={1.3}
+        passThrough
       />
     </div>
   );

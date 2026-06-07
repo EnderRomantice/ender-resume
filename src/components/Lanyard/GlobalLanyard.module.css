@@ -8,18 +8,10 @@
      hangs ~12% down the canvas; this offset closes the gap to the tabbar). */
   top: -70px;
   right: 0;
-  width: 50vw;
+  width: 82vw;
   height: calc(100vh + 70px);
   z-index: 45;
-  /* The badge is draggable; this region (the right side, over the dark panel and
-     page margin) has no critical links, so it's safe to capture pointer events. */
-  pointer-events: auto;
-}
-
-@media (max-width: 860px) {
-  /* On small screens keep it decorative so it never blocks touch scrolling. */
-  .overlay {
-    width: 100vw;
-    pointer-events: none;
-  }
+  /* Large canvas (lots of drag room) that lets clicks fall through — only the 3D
+     badge is interactive (events are raycast from document.body). */
+  pointer-events: none;
 }
