@@ -331,8 +331,8 @@ function Band({
                 /* target may not support capture in passThrough mode */
               }
               // In passThrough mode the drag also reaches the page underneath, which
-              // would start a text selection and selection-auto-scroll. Suppress it.
-              e.nativeEvent?.preventDefault?.();
+              // would start a text selection and selection-auto-scroll. Suppress it
+              // via user-select (preventDefault here would break the drag itself).
               if (typeof document !== 'undefined') document.body.style.userSelect = 'none';
               pullStart.current = { x: e.clientX, y: e.clientY };
               drag(new THREE.Vector3().copy(e.point).sub(vec.copy(card.current.translation())));

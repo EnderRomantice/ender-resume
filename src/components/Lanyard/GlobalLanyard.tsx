@@ -13,7 +13,7 @@ export default function GlobalLanyard() {
         gravity={[0, -40, 0]}
         frontImage="/card-front.png"
         backImage="/logos/creatorone-tile.png"
-        lanyardWidth={1.3}
+        lanyardWidth={1}
         passThrough
       />
     </div>
