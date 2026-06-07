@@ -12,6 +12,7 @@
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.6.1",
     "@react-three/rapier": "^2.2.0",
+    "maplibre-gl": "^5.24.0",
     "meshline": "^3.3.1",
     "next": "16.2.7",
     "react": "19.2.4",

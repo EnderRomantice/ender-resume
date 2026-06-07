@@ -33,6 +33,11 @@ const BLANK_PIXEL =
 // independently. `fit: 'cover'` preserves aspect ratio (no stretching).
 const FRONT_UV_RECT = { x: 0, y: 0, w: 0.5, h: 0.755 };
 const BACK_UV_RECT = { x: 0.5, y: 0, w: 0.5, h: 0.757 };
+type InteractionZone = { x: number; y: number; w: number; h: number; active: boolean; dragging: boolean };
+type InteractionApi = {
+  setDragging: (dragging: boolean) => void;
+  setZone: (zone: Omit<InteractionZone, 'dragging'>) => void;
+};
 
 interface LanyardProps {
   position?: [number, number, number];
@@ -69,20 +74,45 @@ export default function Lanyard({
   // passThrough mode the canvas only captures pointer events when the cursor is
   // inside this box (or a drag is in progress), so hover/clicks pass through to
   // the page everywhere else.
-  const interaction = useRef({ x: 0, y: 0, w: 0, h: 0, active: false, dragging: false });
+  const interaction = useRef<InteractionZone>({ x: 0, y: 0, w: 0, h: 0, active: false, dragging: false });
+  const interactionApi = useMemo<InteractionApi>(
+    () => ({
+      setDragging: (dragging: boolean) => {
+        interaction.current = { ...interaction.current, dragging };
+      },
+      setZone: (zone: Omit<InteractionZone, 'dragging'>) => {
+        interaction.current = { ...interaction.current, ...zone };
+      },
+    }),
+    []
+  );
   const canvasElRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
     if (!passThrough) return;
+    const setCanvasHitTesting = (enabled: boolean): void => {
+      const el = canvasElRef.current;
+      if (el) el.style.pointerEvents = enabled ? 'auto' : 'none';
+    };
     const onMove = (ev: PointerEvent): void => {
       const z = interaction.current;
       const inside =
         z.active && ev.clientX >= z.x && ev.clientX <= z.x + z.w && ev.clientY >= z.y && ev.clientY <= z.y + z.h;
-      const el = canvasElRef.current;
-      if (el) el.style.pointerEvents = inside || z.dragging ? 'auto' : 'none';
+      setCanvasHitTesting(inside || z.dragging);
     };
+    const onPointerUp = (): void => {
+      interaction.current = { ...interaction.current, dragging: false };
+      setCanvasHitTesting(false);
+    };
+    const onBlur = (): void => setCanvasHitTesting(false);
     window.addEventListener('pointermove', onMove, { passive: true });
-    return () => window.removeEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onPointerUp, { passive: true });
+    window.addEventListener('blur', onBlur);
+    return () => {
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onPointerUp);
+      window.removeEventListener('blur', onBlur);
+    };
   }, [passThrough]);
 
   useEffect(() => {
@@ -143,7 +173,7 @@ export default function Lanyard({
             lanyardImage={lanyardImage}
             lanyardWidth={lanyardWidth}
             onPull={onPull}
-            interaction={passThrough ? interaction : undefined}
+            interaction={passThrough ? interactionApi : undefined}
           />
           </Physics>
           <Environment blur={0.75}>
@@ -192,7 +222,7 @@ interface BandProps {
   lanyardImage?: string | null;
   lanyardWidth?: number;
   onPull?: () => void;
-  interaction?: { current: { x: number; y: number; w: number; h: number; active: boolean; dragging: boolean } };
+  interaction?: InteractionApi;
 }
 
 function Band({
@@ -283,8 +313,16 @@ function Band({
   }, [frontImage, backImage, imageFit, frontTex, backTex, materials.base.map]);
 
   const [curve] = useState(
-    () =>
-      new THREE.CatmullRomCurve3([new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()])
+    () => {
+      const nextCurve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(),
+        new THREE.Vector3(),
+        new THREE.Vector3(),
+        new THREE.Vector3(),
+      ]);
+      nextCurve.curveType = 'chordal';
+      return nextCurve;
+    }
   );
   const [dragged, drag] = useState<false | THREE.Vector3>(false);
   const [hovered, hover] = useState(false);
@@ -340,19 +378,25 @@ function Band({
       const sy = rect.top + (vec.y * -0.5 + 0.5) * rect.height;
       dir.set(t.x, t.y - 2.6, t.z).project(state.camera);
       const sy2 = rect.top + (dir.y * -0.5 + 0.5) * rect.height;
-      const halfH = Math.min(190, Math.max(70, Math.abs(sy2 - sy) + 30));
-      const halfW = halfH * 0.74;
-      const z = interaction.current;
-      z.x = sx - halfW;
-      z.y = sy - halfH;
-      z.w = halfW * 2;
-      z.h = halfH * 2;
-      z.active = true;
+      const halfH = Math.min(145, Math.max(58, Math.abs(sy2 - sy) + 14));
+      const halfW = halfH * 0.52;
+      interaction.setZone({
+        x: sx - halfW,
+        y: sy - halfH,
+        w: halfW * 2,
+        h: halfH * 2,
+        active: true,
+      });
     }
   });
 
-  curve.curveType = 'chordal';
-  texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+  useEffect(() => {
+    // Three textures are mutable runtime objects; Rapier/R3F expects this setup in-place.
+    // eslint-disable-next-line react-hooks/immutability
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
+    texture.needsUpdate = true;
+  }, [texture]);
 
   return (
     <>
@@ -388,7 +432,7 @@ function Band({
               }
               pullStart.current = null;
               drag(false);
-              if (interaction) interaction.current.dragging = false;
+              interaction?.setDragging(false);
               // Re-enable text selection (disabled during drag — see onPointerDown)
               // and clear any stray selection the pass-through drag may have started.
               if (typeof document !== 'undefined') {
@@ -406,7 +450,7 @@ function Band({
               // would start a text selection and selection-auto-scroll. Suppress it
               // via user-select (preventDefault here would break the drag itself).
               if (typeof document !== 'undefined') document.body.style.userSelect = 'none';
-              if (interaction) interaction.current.dragging = true;
+              interaction?.setDragging(true);
               pullStart.current = { x: e.clientX, y: e.clientY };
               drag(new THREE.Vector3().copy(e.point).sub(vec.copy(card.current.translation())));
             }}

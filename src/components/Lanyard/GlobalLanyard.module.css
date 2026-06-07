@@ -15,4 +15,15 @@
      pointer-events so it only intercepts when the cursor is over the badge
      (hover/clicks pass through everywhere else). */
   pointer-events: none;
+  transition: transform 0.52s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.overlayVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.overlayHidden {
+  opacity: 1;
+  transform: translateY(calc(-100vh - 90px));
 }

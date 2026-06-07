@@ -1,4 +1,5 @@
 import Image from "next/image";
+import ChengduMap from "@/components/ChengduMap/ChengduMap";
 import styles from "./page.module.css";
 
 const EMAIL = "enderromantic@gmail.com";
@@ -49,15 +50,15 @@ const OPEN_SOURCE = [
     name: "vue-grab",
     rank: "Project Leader",
     desc: "Lead maintainer driving direction, architecture, and releases for the project and its community.",
-    href: "#",
-    label: "vue-grab",
+    href: "https://github.com/EnderRomantice/vue-grab",
+    label: "github.com/EnderRomantice/vue-grab",
   },
   {
     name: "skill-npm",
     rank: "Top 4 Contributor",
     desc: "Core contributor to a developer-tooling package in the npm ecosystem.",
-    href: "#",
-    label: "skill-npm",
+    href: "https://github.com/antfu/skills-npm",
+    label: "github.com/antfu/skills-npm",
   },
 ];
 
@@ -115,24 +116,24 @@ export default function Home() {
       <header className={styles.hero}>
         <div className={styles.heroLeft}>
           <p className={styles.eyebrow}>Full-Stack Developer</p>
-          <h1 className={styles.name}>Ender</h1>
+          <h1 className={styles.name}>Hi, this is Ender</h1>
           <p className={styles.lede}>
-            I build polished web products end to end — from <strong>React</strong> and{" "}
-            <strong>Next.js</strong> interfaces to the services behind them, with a soft spot for{" "}
-            <strong>3D on the web</strong>.
+            Born in <strong>Nanchong, Sichuan</strong>, now based in <strong>Chengdu</strong>. I love
+            building front-end experiences that feel both breathtaking and genuinely usable. That may
+            sound a little contradictory, but it is exactly the goal I keep working toward.
           </p>
-          <div className={styles.heroMeta}>
-            <a className={styles.pill} href={`mailto:${EMAIL}`}>
-              {EMAIL}
-            </a>
-            <a className={styles.pill} href={GITHUB} target="_blank" rel="noreferrer">
-              @EnderRomantice
-            </a>
-          </div>
+          <p className={styles.lede}>
+            I am also into rock music and fashion. Every now and then, I work as a photographer and
+            model, and I maintain my own social media presence.
+          </p>
+          <p className={styles.lede}>
+            If you would like to grab coffee and talk about your life, open source, or anything else,
+            I would be glad to. Just reach me by email.
+          </p>
         </div>
 
         <div className={styles.heroRight}>
-          <div className={styles.stageGrid} />
+          <ChengduMap />
         </div>
       </header>
 
@@ -214,7 +215,7 @@ export default function Home() {
 
         {/* Footer */}
         <footer className={styles.footer}>
-          <span className={styles.footerNote}>© 2026 Ender — built with Next.js &amp; Three.js</span>
+          <span className={styles.footerNote}>© 2026 Ender — built with Next.js &amp; React Bits</span>
           <div className={styles.footerLinks}>
             <a href={`mailto:${EMAIL}`}>Email</a>
             <a href={GITHUB} target="_blank" rel="noreferrer">
