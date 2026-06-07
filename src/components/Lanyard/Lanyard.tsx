@@ -65,6 +65,25 @@ export default function Lanyard({
   // Guards against re-entry: a forwarded click bubbles to the document where R3F's
   // own miss handler would catch it and re-trigger onPointerMissed in a loop.
   const forwardingClick = useRef(false);
+  // The badge's live screen-space box (updated each frame by <Band>). In
+  // passThrough mode the canvas only captures pointer events when the cursor is
+  // inside this box (or a drag is in progress), so hover/clicks pass through to
+  // the page everywhere else.
+  const interaction = useRef({ x: 0, y: 0, w: 0, h: 0, active: false, dragging: false });
+  const canvasElRef = useRef<HTMLCanvasElement | null>(null);
+
+  useEffect(() => {
+    if (!passThrough) return;
+    const onMove = (ev: PointerEvent): void => {
+      const z = interaction.current;
+      const inside =
+        z.active && ev.clientX >= z.x && ev.clientX <= z.x + z.w && ev.clientY >= z.y && ev.clientY <= z.y + z.h;
+      const el = canvasElRef.current;
+      if (el) el.style.pointerEvents = inside || z.dragging ? 'auto' : 'none';
+    };
+    window.addEventListener('pointermove', onMove, { passive: true });
+    return () => window.removeEventListener('pointermove', onMove);
+  }, [passThrough]);
 
   useEffect(() => {
     const handleResize = (): void => setIsMobile(window.innerWidth < 768);
@@ -105,7 +124,13 @@ export default function Lanyard({
               }
             : undefined
         }
-        onCreated={({ gl }) => gl.setClearColor(new THREE.Color(0x000000), transparent ? 0 : 1)}
+        onCreated={({ gl }) => {
+          gl.setClearColor(new THREE.Color(0x000000), transparent ? 0 : 1);
+          if (passThrough) {
+            canvasElRef.current = gl.domElement;
+            gl.domElement.style.pointerEvents = 'none';
+          }
+        }}
       >
         <ambientLight intensity={Math.PI} />
         <Suspense fallback={null}>
@@ -118,6 +143,7 @@ export default function Lanyard({
             lanyardImage={lanyardImage}
             lanyardWidth={lanyardWidth}
             onPull={onPull}
+            interaction={passThrough ? interaction : undefined}
           />
           </Physics>
           <Environment blur={0.75}>
@@ -166,6 +192,7 @@ interface BandProps {
   lanyardImage?: string | null;
   lanyardWidth?: number;
   onPull?: () => void;
+  interaction?: { current: { x: number; y: number; w: number; h: number; active: boolean; dragging: boolean } };
 }
 
 function Band({
@@ -177,7 +204,8 @@ function Band({
   imageFit = 'cover',
   lanyardImage = null,
   lanyardWidth = 1,
-  onPull
+  onPull,
+  interaction
 }: BandProps) {
   // Using "any" for refs since the exact types depend on Rapier's internals
   const band = useRef<any>(null);
@@ -302,6 +330,25 @@ function Band({
       rot.copy(card.current.rotation());
       card.current.setAngvel({ x: ang.x, y: ang.y - rot.y * 0.25, z: ang.z });
     }
+    // Track the badge's screen-space box so the canvas only captures pointer
+    // events while the cursor is over it (hover passes through everywhere else).
+    if (interaction && card.current) {
+      const t = card.current.translation();
+      const rect = state.gl.domElement.getBoundingClientRect();
+      vec.set(t.x, t.y - 1.2, t.z).project(state.camera);
+      const sx = rect.left + (vec.x * 0.5 + 0.5) * rect.width;
+      const sy = rect.top + (vec.y * -0.5 + 0.5) * rect.height;
+      dir.set(t.x, t.y - 2.6, t.z).project(state.camera);
+      const sy2 = rect.top + (dir.y * -0.5 + 0.5) * rect.height;
+      const halfH = Math.min(190, Math.max(70, Math.abs(sy2 - sy) + 30));
+      const halfW = halfH * 0.74;
+      const z = interaction.current;
+      z.x = sx - halfW;
+      z.y = sy - halfH;
+      z.w = halfW * 2;
+      z.h = halfH * 2;
+      z.active = true;
+    }
   });
 
   curve.curveType = 'chordal';
@@ -341,6 +388,7 @@ function Band({
               }
               pullStart.current = null;
               drag(false);
+              if (interaction) interaction.current.dragging = false;
               // Re-enable text selection (disabled during drag — see onPointerDown)
               // and clear any stray selection the pass-through drag may have started.
               if (typeof document !== 'undefined') {
@@ -358,6 +406,7 @@ function Band({
               // would start a text selection and selection-auto-scroll. Suppress it
               // via user-select (preventDefault here would break the drag itself).
               if (typeof document !== 'undefined') document.body.style.userSelect = 'none';
+              if (interaction) interaction.current.dragging = true;
               pullStart.current = { x: e.clientX, y: e.clientY };
               drag(new THREE.Vector3().copy(e.point).sub(vec.copy(card.current.translation())));
             }}

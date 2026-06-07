@@ -11,14 +11,8 @@
   width: 82vw;
   height: calc(100vh + 70px);
   z-index: 45;
-  /* The canvas captures events so the badge drags reliably; clicks that miss the
-     badge are forwarded to the page underneath (see onPointerMissed). */
-  pointer-events: auto;
-}
-
-@media (max-width: 860px) {
-  /* Decorative on small screens so it never blocks touch scrolling. */
-  .overlay {
-    pointer-events: none;
-  }
+  /* The overlay never captures events; the canvas inside toggles its own
+     pointer-events so it only intercepts when the cursor is over the badge
+     (hover/clicks pass through everywhere else). */
+  pointer-events: none;
 }
