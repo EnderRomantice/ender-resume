@@ -62,6 +62,9 @@ export default function Lanyard({
   passThrough = false
 }: LanyardProps) {
   const [isMobile, setIsMobile] = useState<boolean>(() => typeof window !== 'undefined' && window.innerWidth < 768);
+  // Guards against re-entry: a forwarded click bubbles to the document where R3F's
+  // own miss handler would catch it and re-trigger onPointerMissed in a loop.
+  const forwardingClick = useRef(false);
 
   useEffect(() => {
     const handleResize = (): void => setIsMobile(window.innerWidth < 768);
@@ -75,12 +78,33 @@ export default function Lanyard({
         camera={{ position, fov }}
         dpr={[1, isMobile ? 1.5 : 2]}
         gl={{ alpha: transparent }}
-        // In passThrough mode the canvas spans a large area but lets clicks fall
-        // through to the page — only the 3D badge is interactive (events are
-        // raycast from document.body instead of the canvas element).
-        {...(passThrough && typeof document !== 'undefined'
-          ? { eventSource: document.body as HTMLElement, eventPrefix: 'client' as const, style: { pointerEvents: 'none' } }
-          : {})}
+        // In passThrough mode the canvas itself stays interactive (so the badge
+        // drags reliably in every browser), but a click that MISSES the badge is
+        // re-dispatched to the element underneath — so the page stays usable.
+        onPointerMissed={
+          passThrough
+            ? (e: MouseEvent) => {
+                if (typeof document === 'undefined' || forwardingClick.current) return;
+                const target = e.target as HTMLElement | null;
+                // Disable the whole lanyard overlay for one hit-test so we can find
+                // the element underneath and re-dispatch the click to it.
+                const wrapper = target?.closest?.('.lanyard-wrapper') as HTMLElement | null;
+                const overlay = (wrapper?.parentElement as HTMLElement | null) ?? wrapper;
+                if (!overlay) return;
+                // Walk the full stack at the point and take the first element that
+                // isn't part of the lanyard overlay — that's the page underneath.
+                const stack = document.elementsFromPoint(e.clientX, e.clientY) as HTMLElement[];
+                const below = stack.find((el) => !overlay.contains(el));
+                if (below) {
+                  forwardingClick.current = true;
+                  below.dispatchEvent(
+                    new MouseEvent('click', { bubbles: true, cancelable: true, view: window, clientX: e.clientX, clientY: e.clientY })
+                  );
+                  forwardingClick.current = false;
+                }
+              }
+            : undefined
+        }
         onCreated={({ gl }) => gl.setClearColor(new THREE.Color(0x000000), transparent ? 0 : 1)}
       >
         <ambientLight intensity={Math.PI} />

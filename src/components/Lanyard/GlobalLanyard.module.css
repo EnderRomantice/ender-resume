@@ -11,7 +11,14 @@
   width: 82vw;
   height: calc(100vh + 70px);
   z-index: 45;
-  /* Large canvas (lots of drag room) that lets clicks fall through — only the 3D
-     badge is interactive (events are raycast from document.body). */
-  pointer-events: none;
+  /* The canvas captures events so the badge drags reliably; clicks that miss the
+     badge are forwarded to the page underneath (see onPointerMissed). */
+  pointer-events: auto;
+}
+
+@media (max-width: 860px) {
+  /* Decorative on small screens so it never blocks touch scrolling. */
+  .overlay {
+    pointer-events: none;
+  }
 }
