@@ -282,13 +282,24 @@ function Band({
     // Keep the original baked atlas for card edges and any untouched face.
     ctx.drawImage(baseImg, 0, 0, W, H);
 
-    const drawFitted = (img: any, rect: typeof FRONT_UV_RECT) => {
+    const drawFitted = (
+      img: any,
+      rect: typeof FRONT_UV_RECT,
+      opts: { fit?: 'cover' | 'contain'; scale?: number; background?: string | null } = {}
+    ) => {
       const rx = rect.x * W;
       const ry = rect.y * H;
       const rw = rect.w * W;
       const rh = rect.h * H;
-      const pick = imageFit === 'contain' ? Math.min : Math.max;
-      const scale = pick(rw / img.width, rh / img.height);
+      const fit = opts.fit ?? imageFit;
+      // Paint over the baked atlas art (e.g. the back face's default logo) so the
+      // custom image sits on a clean card surface instead of colliding with it.
+      if (opts.background) {
+        ctx.fillStyle = opts.background;
+        ctx.fillRect(rx, ry, rw, rh);
+      }
+      const pick = fit === 'contain' ? Math.min : Math.max;
+      const scale = pick(rw / img.width, rh / img.height) * (opts.scale ?? 1);
       const dw = img.width * scale;
       const dh = img.height * scale;
       const dx = rx + (rw - dw) / 2;
@@ -301,8 +312,25 @@ function Band({
       ctx.restore();
     };
 
+    // Sample the card's paper colour from a blank spot of the back face so we can
+    // cover the baked default logo without guessing at the exact shade.
+    const sampleCardBackground = (): string => {
+      try {
+        const sx = Math.round((BACK_UV_RECT.x + BACK_UV_RECT.w * 0.5) * W);
+        const sy = Math.round((BACK_UV_RECT.y + BACK_UV_RECT.h * 0.94) * H);
+        const [r, g, b] = ctx.getImageData(sx, sy, 1, 1).data;
+        return `rgb(${r}, ${g}, ${b})`;
+      } catch {
+        return '#f2f1ee';
+      }
+    };
+
     if (frontImage && frontTex.image) drawFitted(frontTex.image, FRONT_UV_RECT);
-    if (backImage && backTex.image) drawFitted(backTex.image, BACK_UV_RECT);
+    if (backImage && backTex.image) {
+      // The back logo is centred and scaled down so it reads as a small badge
+      // mark rather than filling (and clashing with) the whole card face.
+      drawFitted(backTex.image, BACK_UV_RECT, { fit: 'contain', scale: 0.5, background: sampleCardBackground() });
+    }
 
     const composite = new THREE.CanvasTexture(canvas);
     composite.colorSpace = THREE.SRGBColorSpace;

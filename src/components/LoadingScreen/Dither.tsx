@@ -68,8 +68,7 @@ float fbm(vec2 p) {
 float pattern(vec2 p) {
   float t = time * waveSpeed;
   vec2 p2 = p - vec2(t, t * 0.68);
-  vec2 p3 = p + vec2(t * 0.42, -t * 0.85);
-  return mix(fbm(p + fbm(p2)), fbm(p * 1.38 + fbm(p3)), 0.36);
+  return fbm(p + fbm(p2));
 }
 
 float bayer(vec2 coord) {
@@ -130,7 +129,7 @@ function createShader(gl: WebGLRenderingContext, type: number, source: string) {
 }
 
 export default function Dither({
-  waveSpeed = 0.72,
+  waveSpeed = 0.16,
   waveFrequency = 3.25,
   waveAmplitude = 0.42,
   waveColor = [0.86, 0.86, 0.86],

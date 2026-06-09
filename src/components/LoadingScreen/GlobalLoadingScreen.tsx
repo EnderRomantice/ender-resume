@@ -5,7 +5,7 @@ import Dither from './Dither';
 import styles from './GlobalLoadingScreen.module.css';
 
 const MIN_VISIBLE_MS = 3200;
-const MAX_WAIT_MS = 6200;
+const MAX_WAIT_MS = 20000;
 const LANYARD_ASSETS = ['/lanyard/card.glb', '/lanyard/lanyard.png', '/card-front.png'];
 
 function preloadImage(src: string) {
@@ -91,7 +91,6 @@ export default function GlobalLoadingScreen() {
       aria-hidden={isReady}
     >
       <Dither />
-      <div className={styles.vignette} />
     </div>
   );
 }
