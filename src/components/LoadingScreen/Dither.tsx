@@ -106,6 +106,11 @@ void main() {
 }
 `;
 
+// Hoisted so the default reference is stable across renders — otherwise a new
+// array each render re-triggers the effect below, which tears down and rebuilds
+// the WebGL context and resets the animation clock (a visible "jump").
+const DEFAULT_WAVE_COLOR: [number, number, number] = [0.86, 0.86, 0.86];
+
 interface DitherProps {
   waveSpeed?: number;
   waveFrequency?: number;
@@ -132,7 +137,7 @@ export default function Dither({
   waveSpeed = 0.16,
   waveFrequency = 3.25,
   waveAmplitude = 0.42,
-  waveColor = [0.86, 0.86, 0.86],
+  waveColor = DEFAULT_WAVE_COLOR,
   colorNum = 4,
   pixelSize = 2,
 }: DitherProps) {
