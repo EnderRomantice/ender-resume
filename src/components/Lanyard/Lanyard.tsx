@@ -340,6 +340,55 @@ function Band({
     return composite;
   }, [frontImage, backImage, imageFit, frontTex, backTex, materials.base.map]);
 
+  // Build the lanyard strap texture. When a custom band image is supplied we
+  // colour-invert it (black-on-transparent logo -> white) and composite it,
+  // centred, onto a black strip matching the original band's layout so the
+  // material's repeat tiles it down the strap exactly as before.
+  const bandMap = useMemo(() => {
+    if (!lanyardImage || !texture.image) return texture;
+
+    const src = texture.image as HTMLImageElement;
+    const logo = document.createElement('canvas');
+    logo.width = src.width;
+    logo.height = src.height;
+    const lctx = logo.getContext('2d');
+    if (!lctx) return texture;
+    lctx.drawImage(src, 0, 0);
+    try {
+      const frame = lctx.getImageData(0, 0, logo.width, logo.height);
+      const px = frame.data;
+      for (let i = 0; i < px.length; i += 4) {
+        px[i] = 255 - px[i];
+        px[i + 1] = 255 - px[i + 1];
+        px[i + 2] = 255 - px[i + 2];
+      }
+      lctx.putImageData(frame, 0, 0);
+    } catch {
+      return texture;
+    }
+
+    const STRIP_W = 1025;
+    const STRIP_H = 250;
+    const strip = document.createElement('canvas');
+    strip.width = STRIP_W;
+    strip.height = STRIP_H;
+    const sctx = strip.getContext('2d');
+    if (!sctx) return texture;
+    sctx.fillStyle = '#000000';
+    sctx.fillRect(0, 0, STRIP_W, STRIP_H);
+    const scale = (STRIP_H * 0.78) / logo.height;
+    const dw = logo.width * scale;
+    const dh = logo.height * scale;
+    sctx.drawImage(logo, (STRIP_W - dw) / 2, (STRIP_H - dh) / 2, dw, dh);
+
+    const composite = new THREE.CanvasTexture(strip);
+    composite.colorSpace = THREE.SRGBColorSpace;
+    composite.wrapS = THREE.RepeatWrapping;
+    composite.wrapT = THREE.RepeatWrapping;
+    composite.needsUpdate = true;
+    return composite;
+  }, [lanyardImage, texture]);
+
   const [curve] = useState(
     () => {
       const nextCurve = new THREE.CatmullRomCurve3([
@@ -505,7 +554,7 @@ function Band({
           depthTest={false}
           resolution={isMobile ? [1000, 2000] : [1000, 1000]}
           useMap={1}
-          map={texture}
+          map={bandMap}
           repeat={[-4, 1]}
           lineWidth={lanyardWidth}
         />

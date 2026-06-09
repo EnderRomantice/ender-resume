@@ -50,6 +50,7 @@ export default function GlobalLanyard() {
         gravity={[0, -40, 0]}
         frontImage="/card-front.png"
         backImage="/logos/scp-card-back.png"
+        lanyardImage="/logos/scp-card-back.png"
         lanyardWidth={1}
         passThrough
       />
