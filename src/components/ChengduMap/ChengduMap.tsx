@@ -6,6 +6,7 @@ import styles from './ChengduMap.module.css';
 
 const LONGQUANYI: [number, number] = [104.2746, 30.5565];
 const MAP_STYLE = 'https://tiles.openfreemap.org/styles/dark';
+const announceMapReady = () => window.dispatchEvent(new Event('ender:map-ready'));
 
 export default function ChengduMap() {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -74,12 +75,16 @@ export default function ChengduMap() {
       markerEl.setAttribute('aria-label', 'Current location marker in Longquanyi District');
 
       markerRef.current = new maplibregl.Marker({ element: markerEl, anchor: 'center' }).setLngLat(LONGQUANYI).addTo(map);
-      map.once('load', () => startAutoZoom(map));
+      map.once('load', () => {
+        startAutoZoom(map);
+        announceMapReady();
+      });
+      map.once('error', announceMapReady);
 
       mapRef.current = map;
     };
 
-    mountMap();
+    mountMap().catch(announceMapReady);
 
     return () => {
       cancelled = true;

@@ -5,20 +5,27 @@ import styles from "./page.module.css";
 const EMAIL = "enderromantic@gmail.com";
 const GITHUB = "https://github.com/EnderRomantice";
 
+const HERO_PROOFS = [
+  "Built a TikTok Shop AI-native platform from 0 to 1",
+  "Top 2 contributor to react-bits",
+  "Full-stack ownership across UI, APIs, auth, data, and agents",
+];
+
 const EXPERIENCE = [
   {
     company: "Creatorone",
-    domain: "TikTok Shop ToB SaaS",
+    domain: "AI-native TikTok Shop platform",
     role: "Full-Stack Developer",
-    dates: "Feb 2026 — Present",
+    dates: "Feb 2026 — Jun 2026",
     location: "North America · Remote",
-    badge: "Current",
+    badge: "Recent",
     logo: "/logos/creatorone.svg",
     logoDark: false,
     bullets: [
-      "Building an enterprise SaaS platform end to end — owning features across the Next.js frontend and the Node.js service layer.",
-      "Designing reusable UI systems and API contracts that keep the product consistent as it scales.",
-      "Shipping production code across the full stack, from data modeling to pixel-level interface polish.",
+      "Built an AI-native TikTok Shop platform from 0 to 1, covering frontend architecture, backend APIs, authentication, authorization, database schema design, and AI agent workflows.",
+      "Developed multi-page business dashboard flows with internationalization, analytics tracking, state management, reusable business components, and polished interaction details.",
+      "Designed backend routing, auth flows, access-control logic, API contracts, and relational data models for secure multi-user business operations.",
+      "Orchestrated AI agent loops with system prompts, Mem0 memory integration, and task execution logic for TikTok Shop seller and creator automation scenarios.",
     ],
   },
   {
@@ -31,9 +38,9 @@ const EXPERIENCE = [
     logo: "/logos/xtrace.png",
     logoDark: true,
     bullets: [
-      "Built and shipped responsive, interactive UI features for the product's web client.",
-      "Contributed to the shared component library, improving consistency and developer velocity.",
-      "Collaborated closely with design to translate mockups into polished, accessible interfaces.",
+      "Worked closely with UI designers to implement the project's overall web interface, translating visual direction into polished, responsive product screens.",
+      "Built chatbot experiences for the product, covering conversational UI flows, interaction states, and frontend integration details.",
+      "Developed browser extension features that extended the product experience beyond the core web client.",
     ],
   },
 ];
@@ -42,38 +49,43 @@ const OPEN_SOURCE = [
   {
     name: "react-bits",
     rank: "Top 2 Contributor",
-    desc: "An open-source library of animated, production-ready React components used by thousands of developers.",
+    desc: "Contributed animation components, examples, fixes, and DX improvements to a widely used React animation library.",
     href: "https://github.com/DavidHDev/react-bits",
     label: "github.com/DavidHDev/react-bits",
   },
   {
     name: "vue-grab",
     rank: "Project Leader",
-    desc: "Lead maintainer driving direction, architecture, and releases for the project and its community.",
+    desc: "Led project direction, component API design, examples, issue triage, and release maintenance for Vue drag interactions.",
     href: "https://github.com/EnderRomantice/vue-grab",
     label: "github.com/EnderRomantice/vue-grab",
   },
   {
     name: "skill-npm",
     rank: "Top 4 Contributor",
-    desc: "Core contributor to a developer-tooling package in the npm ecosystem.",
+    desc: "Improved developer-tooling workflows, package behavior, documentation, and contributor experience in the npm ecosystem.",
     href: "https://github.com/antfu/skills-npm",
     label: "github.com/antfu/skills-npm",
   },
 ];
 
-const SKILLS = [
-  "TypeScript",
-  "React",
-  "Next.js",
-  "Vue",
-  "Node.js",
-  "Three.js / R3F",
-  "Tailwind CSS",
-  "REST / API design",
-  "PostgreSQL",
-  "Git",
-  "UI / Interaction Design",
+const SKILL_GROUPS = [
+  {
+    group: "Frontend",
+    skills: ["TypeScript", "React", "Next.js", "Vue", "Astro", "Tailwind CSS", "R3F / Three.js"],
+  },
+  {
+    group: "Backend",
+    skills: ["Node.js", "NestJS", "REST API Design", "PostgreSQL", "Vercel", "AWS"],
+  },
+  {
+    group: "AI / Agent",
+    skills: ["Harness", "Context Engineering", "Prompt Engineering", "Agent Loop", "Memory", "MCP", "ACP", "RAG"],
+  },
+  {
+    group: "Product",
+    skills: ["AI-native Products", "Analytics Tracking", "Internationalization", "UI / Interaction Design"],
+  },
 ];
 
 const GmailIcon = (
@@ -115,20 +127,24 @@ export default function Home() {
       {/* Hero */}
       <header className={styles.hero}>
         <div className={styles.heroLeft}>
-          <p className={styles.eyebrow}>Full-Stack Developer</p>
-          <h1 className={styles.name}>Hi, this is Ender</h1>
+          <p className={styles.eyebrow}>Full-Stack Developer · AI Native</p>
+          <h1 className={styles.name}>Ender Romantice</h1>
           <p className={styles.lede}>
-            Born in <strong>Nanchong, Sichuan</strong>, now based in <strong>Chengdu</strong>. I love
-            building front-end experiences that feel both breathtaking and genuinely usable. That may
-            sound a little contradictory, but it is exactly the goal I keep working toward.
+            I build <strong>AI-native products</strong>, full-stack systems, open-source React / Vue
+            tools, and polished web experiences that stay useful after the first impression.
           </p>
           <p className={styles.lede}>
-            I am also into rock music and fashion. Every now and then, I work as a photographer and
-            model, and I maintain my own social media presence.
+            Previously built a <strong>TikTok Shop AI-native platform</strong> across frontend,
+            backend, authentication, authorization, database design, and agent orchestration.
           </p>
-          <p className={styles.lede}>
-            If you would like to grab coffee and talk about your life, open source, or anything else,
-            I would be glad to. Just reach me by email.
+          <div className={styles.proofList} aria-label="Profile highlights">
+            {HERO_PROOFS.map((proof) => (
+              <span key={proof}>{proof}</span>
+            ))}
+          </div>
+          <p className={styles.personalNote}>
+            Based in Chengdu. Also into rock music, fashion, photography, modeling, coffee, and
+            conversations that wander somewhere interesting.
           </p>
         </div>
 
@@ -204,11 +220,18 @@ export default function Home() {
             <span className={styles.sectionIndex}>03</span>
             <h2 className={styles.sectionTitle}>Skills &amp; Tools</h2>
           </div>
-          <div className={styles.skills}>
-            {SKILLS.map((s) => (
-              <span key={s} className={styles.skill}>
-                {s}
-              </span>
+          <div className={styles.skillGroups}>
+            {SKILL_GROUPS.map((group) => (
+              <div key={group.group} className={styles.skillGroup}>
+                <h3>{group.group}</h3>
+                <div className={styles.skills}>
+                  {group.skills.map((s) => (
+                    <span key={s} className={styles.skill}>
+                      {s}
+                    </span>
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         </section>

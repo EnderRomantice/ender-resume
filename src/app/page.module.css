@@ -109,7 +109,7 @@
 }
 
 .name {
-  max-width: 9ch;
+  max-width: 11ch;
   font-size: clamp(52px, 6.2vw, 76px);
   line-height: 0.92;
   letter-spacing: 0;
@@ -133,6 +133,40 @@
 
 .lede:last-of-type {
   margin-bottom: 0;
+}
+
+.proofList {
+  display: grid;
+  gap: 9px;
+  margin: 24px 0 22px;
+}
+
+.proofList span {
+  position: relative;
+  padding-left: 20px;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--ink);
+}
+
+.proofList span::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 8px;
+  height: 8px;
+  border: 1px solid var(--ink);
+  border-radius: 50%;
+  background: #fff;
+}
+
+.personalNote {
+  max-width: 50ch;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--muted);
 }
 
 /* right = black stage holding the lanyard */
@@ -363,6 +397,25 @@
 }
 
 /* ---------- Skills ---------- */
+.skillGroups {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 28px 36px;
+}
+
+.skillGroup {
+  display: grid;
+  gap: 13px;
+}
+
+.skillGroup h3 {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
 .skills {
   display: flex;
   flex-wrap: wrap;
@@ -426,6 +479,10 @@
     max-width: 48ch;
   }
 
+  .proofList {
+    margin-top: 22px;
+  }
+
   .heroRight {
     min-height: 520px;
     border-top: 1px solid var(--line);
@@ -443,6 +500,10 @@
   }
 
   .osGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .skillGroups {
     grid-template-columns: 1fr;
   }
 

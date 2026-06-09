@@ -11,23 +11,34 @@ export default function GlobalLanyard() {
   const [isInExperience, setIsInExperience] = useState(false);
 
   useEffect(() => {
-    const experience = document.getElementById('experience');
-    if (!experience) return;
+    let rafId = 0;
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        const nextIsInExperience = Boolean(entry?.isIntersecting);
-        if (nextIsInExperience) setHasEnteredExperience(true);
-        setIsInExperience(nextIsInExperience);
-      },
-      {
-        rootMargin: '-8% 0px -44% 0px',
-        threshold: 0,
-      }
-    );
+    const updateVisibility = () => {
+      const experience = document.getElementById('experience');
+      if (!experience) return;
 
-    observer.observe(experience);
-    return () => observer.disconnect();
+      const rect = experience.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const shouldShow = rect.top <= viewportHeight * 0.9 && rect.bottom >= viewportHeight * 0.36;
+
+      if (shouldShow) setHasEnteredExperience(true);
+      setIsInExperience(shouldShow);
+    };
+
+    const scheduleUpdate = () => {
+      window.cancelAnimationFrame(rafId);
+      rafId = window.requestAnimationFrame(updateVisibility);
+    };
+
+    updateVisibility();
+    window.addEventListener('scroll', scheduleUpdate, { passive: true });
+    window.addEventListener('resize', scheduleUpdate);
+
+    return () => {
+      window.cancelAnimationFrame(rafId);
+      window.removeEventListener('scroll', scheduleUpdate);
+      window.removeEventListener('resize', scheduleUpdate);
+    };
   }, []);
 
   if (!hasEnteredExperience) return null;
@@ -38,7 +49,6 @@ export default function GlobalLanyard() {
         position={[0, 0, 30]}
         gravity={[0, -40, 0]}
         frontImage="/card-front.png"
-        backImage="/logos/creatorone-tile.png"
         lanyardWidth={1}
         passThrough
       />
