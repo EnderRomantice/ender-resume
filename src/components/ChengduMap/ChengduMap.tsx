@@ -128,45 +128,6 @@ export default function ChengduMap() {
           .addTo(map),
       ];
       map.once('load', () => {
-        map.addSource('life-route', {
-          type: 'geojson',
-          data: {
-            type: 'Feature',
-            properties: {},
-            geometry: {
-              type: 'LineString',
-              coordinates: [NANBU, LONGQUANYI],
-            },
-          },
-        });
-        map.addLayer({
-          id: 'life-route-glow',
-          type: 'line',
-          source: 'life-route',
-          layout: {
-            'line-cap': 'round',
-            'line-join': 'round',
-          },
-          paint: {
-            'line-color': 'rgba(250, 250, 250, 0.42)',
-            'line-width': 3,
-            'line-blur': 4,
-          },
-        });
-        map.addLayer({
-          id: 'life-route',
-          type: 'line',
-          source: 'life-route',
-          layout: {
-            'line-cap': 'round',
-            'line-join': 'round',
-          },
-          paint: {
-            'line-color': 'rgba(250, 250, 250, 0.54)',
-            'line-width': 1,
-            'line-dasharray': [2, 2],
-          },
-        });
         const bounds = new maplibregl.LngLatBounds(NANBU, NANBU).extend(LONGQUANYI).extend(CURRENT_LOCATION);
         map.fitBounds(bounds, {
           padding: { top: 86, right: 84, bottom: 112, left: 84 },
