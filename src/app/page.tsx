@@ -5,12 +5,6 @@ import styles from "./page.module.css";
 const EMAIL = "enderromantic@gmail.com";
 const GITHUB = "https://github.com/EnderRomantice";
 
-const HERO_PROOFS = [
-  "Built a TikTok Shop AI-native platform from 0 to 1",
-  "Top 2 contributor to react-bits",
-  "Full-stack ownership across UI, APIs, auth, data, and agents",
-];
-
 const EXPERIENCE = [
   {
     company: "Creatorone",
@@ -133,15 +127,6 @@ export default function Home() {
             I build <strong>AI-native products</strong>, full-stack systems, open-source React / Vue
             tools, and polished web experiences that stay useful after the first impression.
           </p>
-          <p className={styles.lede}>
-            Previously built a <strong>TikTok Shop AI-native platform</strong> across frontend,
-            backend, authentication, authorization, database design, and agent orchestration.
-          </p>
-          <div className={styles.proofList} aria-label="Profile highlights">
-            {HERO_PROOFS.map((proof) => (
-              <span key={proof}>{proof}</span>
-            ))}
-          </div>
           <p className={styles.personalNote}>
             Based in Chengdu. Also into rock music, fashion, photography, modeling, coffee, and
             conversations that wander somewhere interesting.

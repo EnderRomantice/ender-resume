@@ -135,33 +135,6 @@
   margin-bottom: 0;
 }
 
-.proofList {
-  display: grid;
-  gap: 9px;
-  margin: 24px 0 22px;
-}
-
-.proofList span {
-  position: relative;
-  padding-left: 20px;
-  font-family: var(--font-geist-mono), monospace;
-  font-size: 12.5px;
-  line-height: 1.45;
-  color: var(--ink);
-}
-
-.proofList span::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0.55em;
-  width: 8px;
-  height: 8px;
-  border: 1px solid var(--ink);
-  border-radius: 50%;
-  background: #fff;
-}
-
 .personalNote {
   max-width: 50ch;
   font-size: 14px;
@@ -477,10 +450,6 @@
 
   .lede {
     max-width: 48ch;
-  }
-
-  .proofList {
-    margin-top: 22px;
   }
 
   .heroRight {
