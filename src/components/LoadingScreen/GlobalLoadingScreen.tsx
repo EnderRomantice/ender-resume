@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import Dither from './Dither';
 import styles from './GlobalLoadingScreen.module.css';
 
-const MIN_VISIBLE_MS = 3200;
 const MAX_WAIT_MS = 20000;
 const LANYARD_ASSETS = ['/lanyard/card.glb', '/lanyard/lanyard.png', '/card-front.png'];
 
@@ -39,15 +38,10 @@ export default function GlobalLoadingScreen() {
     let mapReady = false;
     let pageReady = document.readyState === 'complete';
     let lanyardReady = false;
-    const startedAt = performance.now();
 
     const maybeFinish = () => {
       if (cancelled || !mapReady || !pageReady || !lanyardReady) return;
-
-      const elapsed = performance.now() - startedAt;
-      window.setTimeout(() => {
-        if (!cancelled) setIsReady(true);
-      }, Math.max(0, MIN_VISIBLE_MS - elapsed));
+      setIsReady(true);
     };
 
     const onMapReady = () => {
