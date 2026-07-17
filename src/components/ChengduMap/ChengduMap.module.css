@@ -151,31 +151,6 @@
   color: rgba(250, 250, 250, 0.58);
 }
 
-.distanceBadge {
-  position: absolute;
-  top: 24px;
-  right: 24px;
-  z-index: 2;
-  display: grid;
-  gap: 5px;
-  padding: 10px 12px;
-  border: 1px solid rgba(250, 250, 250, 0.2);
-  border-radius: 8px;
-  background: rgba(5, 5, 5, 0.56);
-  color: rgba(250, 250, 250, 0.9);
-  font-family: var(--font-geist-mono), monospace;
-  font-size: 13px;
-  letter-spacing: 0.03em;
-  backdrop-filter: blur(8px);
-}
-
-.distanceKicker {
-  color: rgba(250, 250, 250, 0.52);
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
 .loading {
   position: absolute;
   inset: 0;
@@ -197,10 +172,5 @@
   .plate {
     left: 20px;
     bottom: 20px;
-  }
-
-  .distanceBadge {
-    top: 20px;
-    right: 20px;
   }
 }
