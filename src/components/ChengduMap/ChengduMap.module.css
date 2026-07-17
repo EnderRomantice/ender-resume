@@ -70,6 +70,52 @@
   z-index: 0;
 }
 
+.selfLabel,
+.otherLabel {
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  padding: 4px 7px;
+  border: 1px solid rgba(248, 255, 249, 0.68);
+  border-radius: 999px;
+  background: rgba(5, 5, 5, 0.9);
+  color: rgba(248, 255, 249, 0.96);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 9px;
+  font-weight: 650;
+  letter-spacing: 0.12em;
+  line-height: 1;
+  white-space: nowrap;
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.38);
+  transform: translateX(-50%);
+}
+
+.selfLabel {
+  top: -25px;
+}
+
+.otherMarker {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  width: 86px;
+  transform: translateY(-4px);
+}
+
+.otherMarker .otherLabel {
+  position: relative;
+  left: auto;
+  transform: none;
+  border-color: rgba(255, 214, 112, 0.88);
+  background: rgba(63, 43, 8, 0.94);
+  color: #ffe3a1;
+}
+
+.otherMarker .markerIcon {
+  flex: none;
+}
+
 .markerIcon {
   position: relative;
   width: 36px;

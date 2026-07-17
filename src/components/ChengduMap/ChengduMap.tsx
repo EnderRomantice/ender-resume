@@ -171,6 +171,21 @@ export default function ChengduMap() {
         avatar.src = '/ender.jpg';
         avatar.alt = '';
         markerEl.appendChild(avatar);
+        const label = document.createElement('span');
+        label.className = styles.selfLabel;
+        label.textContent = 'YOU';
+        markerEl.appendChild(label);
+        return markerEl;
+      };
+
+      const createOtherMarker = () => {
+        const markerEl = document.createElement('div');
+        markerEl.className = styles.otherMarker;
+        markerEl.setAttribute('aria-label', 'Other person location in Chengdu');
+        markerEl.innerHTML = `
+          <span class="${styles.otherLabel}">OTHER</span>
+          <span class="${styles.markerIcon} ${styles.residenceMarker}">${RESIDENCE_ICON}</span>
+        `;
         return markerEl;
       };
 
@@ -182,8 +197,8 @@ export default function ChengduMap() {
           .setLngLat(NANBU)
           .addTo(map),
         new maplibregl.Marker({
-          element: createIconMarker(styles.residenceMarker, 'Other person location marker in Chengdu', RESIDENCE_ICON),
-          anchor: 'center',
+          element: createOtherMarker(),
+          anchor: 'bottom',
         })
           .setLngLat(OTHER_LOCATION)
           .addTo(map),
@@ -205,18 +220,24 @@ export default function ChengduMap() {
             },
           });
           map.addLayer({
+            id: 'location-distance-casing',
+            type: 'line',
+            source: 'location-distance',
+            paint: { 'line-color': '#050505', 'line-width': 7, 'line-opacity': 0.82 },
+          });
+          map.addLayer({
             id: 'location-distance',
             type: 'line',
             source: 'location-distance',
-            paint: { 'line-color': '#f8fff9', 'line-width': 1.5, 'line-opacity': 0.62, 'line-dasharray': [2, 2] },
+            paint: { 'line-color': '#f8fff9', 'line-width': 2.5, 'line-opacity': 0.96 },
           });
         }
 
-        const bounds = new maplibregl.LngLatBounds(NANBU, NANBU).extend(OTHER_LOCATION).extend(currentLocation);
+        const bounds = new maplibregl.LngLatBounds(OTHER_LOCATION, OTHER_LOCATION).extend(currentLocation);
         map.fitBounds(bounds, {
-          padding: { top: 86, right: 84, bottom: 112, left: 84 },
+          padding: { top: 120, right: 120, bottom: 130, left: 120 },
           duration: 900,
-          maxZoom: 7.4,
+          maxZoom: 10.6,
         });
         map.once('idle', () => {
           startAutoZoom(map);
