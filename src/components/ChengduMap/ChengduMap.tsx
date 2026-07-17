@@ -1,15 +1,62 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { Map as MapLibreMap, Marker as MapLibreMarker } from 'maplibre-gl';
 import styles from './ChengduMap.module.css';
 
 const NANBU: [number, number] = [106.0611, 31.3532];
-const LONGQUANYI: [number, number] = [104.2746, 30.5565];
-const CURRENT_LOCATION: [number, number] = [104.2826, 30.976];
+const OTHER_LOCATION: [number, number] = [104.2746, 30.5565];
+const FALLBACK_CURRENT_LOCATION: [number, number] = [104.0668, 30.5728];
 const MAP_CENTER: [number, number] = [105.1679, 30.9549];
 const MAP_STYLE = 'https://tiles.openfreemap.org/styles/dark';
 const announceMapReady = () => window.dispatchEvent(new Event('ender:map-ready'));
+
+type LocationSummary = {
+  current: [number, number];
+  live: boolean;
+  distance: string | null;
+};
+
+function distanceBetween([lng1, lat1]: [number, number], [lng2, lat2]: [number, number]) {
+  const earthRadiusKm = 6371;
+  const toRadians = (degrees: number) => (degrees * Math.PI) / 180;
+  const latitudeDelta = toRadians(lat2 - lat1);
+  const longitudeDelta = toRadians(lng2 - lng1);
+  const a =
+    Math.sin(latitudeDelta / 2) ** 2 +
+    Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) * Math.sin(longitudeDelta / 2) ** 2;
+
+  return earthRadiusKm * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function readBrowserLocation() {
+  return new Promise<[number, number] | null>((resolve) => {
+    if (!navigator.geolocation) {
+      resolve(null);
+      return;
+    }
+
+    let settled = false;
+    const finish = (location: [number, number] | null) => {
+      if (settled) return;
+      settled = true;
+      resolve(location);
+    };
+
+    const timeout = window.setTimeout(() => finish(null), 4500);
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        window.clearTimeout(timeout);
+        finish([coords.longitude, coords.latitude]);
+      },
+      () => {
+        window.clearTimeout(timeout);
+        finish(null);
+      },
+      { enableHighAccuracy: false, maximumAge: 5 * 60 * 1000, timeout: 4000 }
+    );
+  });
+}
 
 const HOME_ICON = `
   <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -31,6 +78,11 @@ export default function ChengduMap() {
   const mapRef = useRef<MapLibreMap | null>(null);
   const markerRefs = useRef<MapLibreMarker[]>([]);
   const zoomTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [locationSummary, setLocationSummary] = useState<LocationSummary>({
+    current: FALLBACK_CURRENT_LOCATION,
+    live: false,
+    distance: null,
+  });
 
   useEffect(() => {
     let cancelled = false;
@@ -74,13 +126,25 @@ export default function ChengduMap() {
     };
 
     const mountMap = async () => {
+      const browserLocation = await readBrowserLocation();
+      if (cancelled) return;
+
+      const currentLocation = browserLocation ?? FALLBACK_CURRENT_LOCATION;
+      const live = browserLocation !== null;
+      const distance = live ? distanceBetween(OTHER_LOCATION, currentLocation) : null;
+      setLocationSummary({
+        current: currentLocation,
+        live,
+        distance: distance !== null ? `${distance.toFixed(1)} km` : null,
+      });
+
       const maplibregl = await import('maplibre-gl');
       if (cancelled || !containerRef.current || mapRef.current) return;
 
       const map = new maplibregl.Map({
         container: containerRef.current,
         style: MAP_STYLE,
-        center: MAP_CENTER,
+        center: live ? currentLocation : MAP_CENTER,
         zoom: 7.1,
         pitch: 38,
         bearing: -12,
@@ -99,7 +163,10 @@ export default function ChengduMap() {
       const createAvatarMarker = () => {
         const markerEl = document.createElement('div');
         markerEl.className = styles.marker;
-        markerEl.setAttribute('aria-label', 'Current location avatar marker in Guanghan, Sichuan');
+        markerEl.setAttribute(
+          'aria-label',
+          live ? 'Your live location from this browser' : 'Current location marker in Chengdu, Sichuan'
+        );
         const avatar = document.createElement('img');
         avatar.src = '/ender.jpg';
         avatar.alt = '';
@@ -115,20 +182,37 @@ export default function ChengduMap() {
           .setLngLat(NANBU)
           .addTo(map),
         new maplibregl.Marker({
-          element: createIconMarker(styles.residenceMarker, 'Residence marker in Longquanyi, Chengdu', RESIDENCE_ICON),
+          element: createIconMarker(styles.residenceMarker, 'Other person location marker in Chengdu', RESIDENCE_ICON),
           anchor: 'center',
         })
-          .setLngLat(LONGQUANYI)
+          .setLngLat(OTHER_LOCATION)
           .addTo(map),
         new maplibregl.Marker({
           element: createAvatarMarker(),
           anchor: 'bottom',
         })
-          .setLngLat(CURRENT_LOCATION)
+          .setLngLat(currentLocation)
           .addTo(map),
       ];
       map.once('load', () => {
-        const bounds = new maplibregl.LngLatBounds(NANBU, NANBU).extend(LONGQUANYI).extend(CURRENT_LOCATION);
+        if (live) {
+          map.addSource('location-distance', {
+            type: 'geojson',
+            data: {
+              type: 'Feature',
+              properties: {},
+              geometry: { type: 'LineString', coordinates: [OTHER_LOCATION, currentLocation] },
+            },
+          });
+          map.addLayer({
+            id: 'location-distance',
+            type: 'line',
+            source: 'location-distance',
+            paint: { 'line-color': '#f8fff9', 'line-width': 1.5, 'line-opacity': 0.62, 'line-dasharray': [2, 2] },
+          });
+        }
+
+        const bounds = new maplibregl.LngLatBounds(NANBU, NANBU).extend(OTHER_LOCATION).extend(currentLocation);
         map.fitBounds(bounds, {
           padding: { top: 86, right: 84, bottom: 112, left: 84 },
           duration: 900,
@@ -156,13 +240,24 @@ export default function ChengduMap() {
   }, []);
 
   return (
-    <div className={styles.mapShell} aria-label="Map centered on Guanghan, Sichuan, China">
+    <div
+      className={styles.mapShell}
+      aria-label={locationSummary.live ? 'Map showing your live location and another location in Chengdu' : 'Map centered on Chengdu, Sichuan, China'}
+    >
       <div className={styles.loading}>Loading Chengdu map</div>
       <div ref={containerRef} className={styles.map} />
+      {locationSummary.live && locationSummary.distance && (
+        <div className={styles.distanceBadge} aria-label={`Distance between locations: ${locationSummary.distance}`}>
+          <span className={styles.distanceKicker}>You ↔ Other</span>
+          <span>{locationSummary.distance}</span>
+        </div>
+      )}
       <div className={styles.plate}>
         <span className={styles.kicker}>Currently based in</span>
-        <span className={styles.city}>Guanghan, Sichuan</span>
-        <span className={styles.coords}>30.9760 N · 104.2826 E</span>
+        <span className={styles.city}>{locationSummary.live ? 'Live · Chengdu' : 'Chengdu, Sichuan'}</span>
+        <span className={styles.coords}>
+          {locationSummary.current[1].toFixed(4)} N · {locationSummary.current[0].toFixed(4)} E
+        </span>
       </div>
     </div>
   );
