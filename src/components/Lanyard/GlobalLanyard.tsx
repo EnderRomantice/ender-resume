@@ -31,12 +31,12 @@ export default function GlobalLanyard() {
     };
 
     updateVisibility();
-    window.addEventListener('scroll', scheduleUpdate, { passive: true });
+    document.addEventListener('scroll', scheduleUpdate, { capture: true, passive: true });
     window.addEventListener('resize', scheduleUpdate);
 
     return () => {
       window.cancelAnimationFrame(rafId);
-      window.removeEventListener('scroll', scheduleUpdate);
+      document.removeEventListener('scroll', scheduleUpdate, { capture: true });
       window.removeEventListener('resize', scheduleUpdate);
     };
   }, []);
