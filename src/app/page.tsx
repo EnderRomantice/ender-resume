@@ -1,5 +1,6 @@
 import Image from "next/image";
 import ChengduMap from "@/components/ChengduMap/ChengduMap";
+import PageParticleScroll from "@/components/PageParticleScroll/PageParticleScroll";
 import styles from "./page.module.css";
 
 const EMAIL = "enderromantic@gmail.com";
@@ -9,14 +10,14 @@ const EXPERIENCE = [
   {
     company: "GoldMiner",
     domain: "Vertical AI agent for cross-border e-commerce",
-    role: "Full-Stack / Agent Developer",
-    dates: "Jun 2026 — Present",
+    role: "Full-Stack / Agent Developer Intern",
+    dates: "Jun 2026 — Jul 2026",
     location: "Fujian, China",
-    badge: "Current",
+    badge: "Recent",
     logo: "/logos/goldminer-logo.webp",
     logoDark: true,
     bullets: [
-      "Building a vertical AI agent for cross-border e-commerce, spanning frontend product screens, backend business services, and agent workflow orchestration.",
+      "Built a vertical AI agent for cross-border e-commerce, spanning frontend product screens, backend business services, and agent workflow orchestration.",
       "Designed and implemented frontend pages around e-commerce operations such as product research, market analysis, task setup, and result review.",
       "Developed backend APIs, data flows, and task-state handling to connect user-facing workflows with agent execution logic.",
       "Orchestrated agent flows that turn user goals into context collection, planning, tool execution, and structured result generation.",
@@ -140,8 +141,9 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Hero */}
-      <header className={styles.hero}>
+      <PageParticleScroll>
+        {/* Hero */}
+        <header className={styles.hero}>
         <div className={styles.heroLeft}>
           <p className={styles.eyebrow}>Full-Stack Developer · AI Native</p>
           <h1 className={styles.name}>Ender Romantice</h1>
@@ -158,9 +160,9 @@ export default function Home() {
         <div className={styles.heroRight}>
           <ChengduMap />
         </div>
-      </header>
+        </header>
 
-      <main className={styles.container}>
+        <main className={styles.container}>
         {/* Experience */}
         <section id="experience" className={styles.section}>
           <div className={styles.sectionHead}>
@@ -260,7 +262,8 @@ export default function Home() {
             </a>
           </div>
         </footer>
-      </main>
+        </main>
+      </PageParticleScroll>
     </div>
   );
 }
