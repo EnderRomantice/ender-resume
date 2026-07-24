@@ -1,11 +1,38 @@
 .viewport {
   flex: 1;
   min-height: 0;
+  overflow: auto;
   background: var(--bg);
+}
+
+@supports (animation-timeline: view()) {
+  .viewport :global(main > section),
+  .viewport :global(main > footer) {
+    animation: scroll-reveal both linear;
+    animation-timeline: view(block);
+    animation-range: entry 0% entry 32%;
+  }
+}
+
+@keyframes scroll-reveal {
+  from {
+    opacity: 0.25;
+    transform: translateY(28px) scale(0.992);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .viewport {
     scroll-behavior: auto;
+  }
+
+  .viewport :global(main > section),
+  .viewport :global(main > footer) {
+    animation: none;
   }
 }
