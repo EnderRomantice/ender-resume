@@ -62,6 +62,7 @@ const OPEN_SOURCE = [
     rank: "Top 2 Contributor",
     desc: "Contributed animation components, examples, fixes, and DX improvements to a widely used React animation library.",
     href: "https://github.com/DavidHDev/react-bits",
+    preview: "https://reactbits.dev/",
     stars: "42.4k",
   },
   {
@@ -69,6 +70,7 @@ const OPEN_SOURCE = [
     rank: "Project Leader",
     desc: "Led project direction, component API design, examples, issue triage, and release maintenance for Vue drag interactions.",
     href: "https://github.com/EnderRomantice/vue-grab",
+    preview: "https://vue-grab.vercel.app/",
     stars: "88",
   },
   {
@@ -76,6 +78,7 @@ const OPEN_SOURCE = [
     rank: "Top 4 Contributor",
     desc: "Improved developer-tooling workflows, package behavior, documentation, and contributor experience in the npm ecosystem.",
     href: "https://github.com/antfu/skills-npm",
+    preview: "https://www.jsdelivr.com/package/npm/skills-npm",
     stars: "479",
   },
 ];
@@ -145,7 +148,6 @@ export default function Home() {
         {/* Hero */}
         <header className={styles.hero}>
         <div className={styles.heroLeft}>
-          <p className={styles.eyebrow}>Full-Stack Developer · AI Native</p>
           <h1 className={styles.name}>Ender Romantice</h1>
           <p className={styles.lede}>
             I build <strong>AI-native products</strong>, full-stack systems, open-source React / Vue
@@ -206,25 +208,36 @@ export default function Home() {
           <div className={styles.osGrid}>
             {OPEN_SOURCE.map((p) => (
               <article key={p.name} className={styles.osCard}>
-                <div className={styles.osTop}>
-                  <span className={styles.osRank}>{p.rank}</span>
-                  <a
-                    className={styles.osGitHub}
-                    href={p.href}
-                    target="_blank"
-                    rel="noreferrer"
-                    aria-label={`Open ${p.name} on GitHub`}
-                    title={`Open ${p.name} on GitHub`}
-                  >
-                    {GitHubIcon}
-                  </a>
+                <div className={styles.osPreview}>
+                  <iframe
+                    src={p.preview}
+                    title={`${p.name} website preview`}
+                    loading="lazy"
+                    sandbox="allow-scripts allow-same-origin"
+                    referrerPolicy="no-referrer"
+                  />
                 </div>
-                <span className={styles.osName}>{p.name}</span>
-                <span className={styles.osDesc}>{p.desc}</span>
-                <span className={styles.osMeta} aria-label={`${p.name} GitHub stars`}>
-                  {StarIcon}
-                  {p.stars}
-                </span>
+                <div className={styles.osContent}>
+                  <div className={styles.osTop}>
+                    <span className={styles.osRank}>{p.rank}</span>
+                    <a
+                      className={styles.osGitHub}
+                      href={p.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label={`Open ${p.name} on GitHub`}
+                      title={`Open ${p.name} on GitHub`}
+                    >
+                      {GitHubIcon}
+                    </a>
+                  </div>
+                  <span className={styles.osName}>{p.name}</span>
+                  <span className={styles.osDesc}>{p.desc}</span>
+                  <span className={styles.osMeta} aria-label={`${p.name} GitHub stars`}>
+                    {StarIcon}
+                    {p.stars}
+                  </span>
+                </div>
               </article>
             ))}
           </div>
