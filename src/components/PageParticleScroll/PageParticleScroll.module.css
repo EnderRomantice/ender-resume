@@ -1,0 +1,11 @@
+.viewport {
+  flex: 1;
+  min-height: 0;
+  background: var(--bg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .viewport {
+    scroll-behavior: auto;
+  }
+}
