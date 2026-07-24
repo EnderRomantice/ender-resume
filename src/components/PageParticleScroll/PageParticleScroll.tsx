@@ -70,19 +70,32 @@ export default function PageParticleScroll({ children }: PageParticleScrollProps
       previousScroll = window.scrollY;
       if (reducedMotion.matches || Math.abs(delta) < 1) return;
 
-      const amount = Math.min(90, Math.max(18, Math.round(Math.abs(delta) * 0.8)));
+      const originRects = revealTargets.flatMap((target) => {
+        const targetRect = target.getBoundingClientRect();
+        if (targetRect.bottom < -80 || targetRect.top > window.innerHeight + 80) return [];
+
+        return Array.from(
+          target.querySelectorAll<HTMLElement>("h3, p, li, span, img, iframe"),
+        )
+          .map((element) => element.getBoundingClientRect())
+          .filter((rect) => rect.width > 4 && rect.height > 4);
+      });
+
+      if (!originRects.length) return;
+
+      const amount = Math.min(52, Math.max(12, Math.round(Math.abs(delta) * 0.28)));
       const direction = Math.sign(delta);
-      const line = window.innerHeight * 0.72;
 
       for (let index = 0; index < amount; index += 1) {
+        const origin = originRects[Math.floor(Math.random() * originRects.length)];
         particles.push({
-          x: Math.random() * window.innerWidth,
-          y: line + (Math.random() - 0.5) * 70,
-          vx: (Math.random() - 0.5) * 2.8,
-          vy: -direction * (0.5 + Math.random() * 2.2),
-          radius: 0.6 + Math.random() * 1.5,
-          life: 0.45 + Math.random() * 0.55,
-          decay: 0.018 + Math.random() * 0.02,
+          x: origin.left + Math.random() * origin.width,
+          y: origin.top + Math.random() * origin.height,
+          vx: (Math.random() - 0.5) * 1.8,
+          vy: -direction * (0.35 + Math.random() * 1.5),
+          radius: 0.45 + Math.random() * 1.05,
+          life: 0.35 + Math.random() * 0.45,
+          decay: 0.022 + Math.random() * 0.025,
         });
       }
 
@@ -96,17 +109,25 @@ export default function PageParticleScroll({ children }: PageParticleScrollProps
     const revealObserver = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          (entry.target as HTMLElement).dataset.scrollVisible = String(entry.isIntersecting);
+          const target = entry.target as HTMLElement;
+          const progress = entry.isIntersecting
+            ? Math.min(1, entry.intersectionRatio / 0.16)
+            : 0;
+          target.dataset.scrollVisible = String(progress > 0);
+          target.style.setProperty("--scroll-progress", String(progress));
         }
       },
       {
-        rootMargin: "-6% 0px -8%",
-        threshold: 0.12,
+        rootMargin: "2% 0px",
+        threshold: [0, 0.02, 0.04, 0.07, 0.1, 0.13, 0.16, 0.22],
       },
     );
 
     for (const target of revealTargets) {
-      if (reducedMotion.matches) target.dataset.scrollVisible = "true";
+      if (reducedMotion.matches) {
+        target.dataset.scrollVisible = "true";
+        target.style.setProperty("--scroll-progress", "1");
+      }
       else revealObserver.observe(target);
     }
 

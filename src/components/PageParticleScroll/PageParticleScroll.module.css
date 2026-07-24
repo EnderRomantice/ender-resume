@@ -14,20 +14,17 @@
 }
 
 .viewport :global([data-scroll-reveal]) {
-  opacity: 0;
-  filter: blur(9px);
-  transform: translateY(38px) scale(0.985);
+  --scroll-progress: 0;
+  opacity: var(--scroll-progress);
+  filter: blur(calc((1 - var(--scroll-progress)) * 3px));
+  transform:
+    translateY(calc((1 - var(--scroll-progress)) * 16px))
+    scale(calc(0.992 + (var(--scroll-progress) * 0.008)));
   transition:
-    opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
-    filter 0.8s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    opacity 0.18s linear,
+    filter 0.28s linear,
+    transform 0.28s linear;
   will-change: opacity, filter, transform;
-}
-
-.viewport :global([data-scroll-reveal][data-scroll-visible="true"]) {
-  opacity: 1;
-  filter: blur(0);
-  transform: translateY(0) scale(1);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -36,6 +33,7 @@
   }
 
   .viewport :global([data-scroll-reveal]) {
+    --scroll-progress: 1;
     opacity: 1;
     filter: none;
     transform: none;
