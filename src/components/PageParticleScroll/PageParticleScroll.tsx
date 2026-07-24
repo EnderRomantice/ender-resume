@@ -24,6 +24,7 @@ export default function PageParticleScroll({ children }: PageParticleScrollProps
       fade={0.72}
       settle={0.85}
       smoothing={0.32}
+      disableAfterBottom
     >
       {children}
     </ParticleScroll>

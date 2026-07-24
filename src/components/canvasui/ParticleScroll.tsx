@@ -31,6 +31,8 @@ export interface ParticleScrollOptions {
   fade?: number;
   /** Seconds a row of dust takes to condense into the page once the reveal reaches it. */
   settle?: number;
+  /** Permanently disables the particle transition after the content reaches the bottom. */
+  disableAfterBottom?: boolean;
   /** Seconds the damped scroll takes to catch up with the real scroll. Higher feels more fluid. */
   smoothing?: number;
 }
@@ -65,6 +67,7 @@ const DEFAULTS: Required<ParticleScrollOptions> = {
   stagger: 0.7,
   fade: 0.85,
   settle: 1.2,
+  disableAfterBottom: false,
   smoothing: 0.6,
 };
 
@@ -421,6 +424,7 @@ export function createParticleScroll(
   let introWait = 0;
   let introReady = false;
   let scrollSmooth = content.scrollTop;
+  let disabledAfterBottom = false;
   syncCanvasSize();
   syncBgColor();
 
@@ -442,7 +446,7 @@ export function createParticleScroll(
   }
 
   function rowTargetFor(docRowY: number) {
-    if (reducedMotion || !introDone) return 1;
+    if (reducedMotion || !introDone || disabledAfterBottom) return 1;
     const h = Math.max(output.clientHeight, 1);
     const band = Math.max(config.band, 1);
     const max = content.scrollHeight - content.clientHeight;
@@ -483,7 +487,7 @@ export function createParticleScroll(
       let p = rowProgress[i];
       const inWin = i >= winStart - 4 && i < winStart + winLen + 4;
       if (p !== target) {
-        if (reducedMotion || !inWin) {
+        if (reducedMotion || disabledAfterBottom || !inWin) {
           p = target;
         } else {
           if (p < target) p = Math.min(p + dt / settle, target);
@@ -607,11 +611,19 @@ export function createParticleScroll(
     lastTime = now;
     time += delta;
     const scrollTop = content.scrollTop;
+    const maxScrollTop = content.scrollHeight - content.clientHeight;
+    if (
+      config.disableAfterBottom &&
+      maxScrollTop > 1 &&
+      scrollTop >= maxScrollTop - 1
+    ) {
+      disabledAfterBottom = true;
+    }
     lag += scrollTop - lastScrollTop;
     lastScrollTop = scrollTop;
     lag *= Math.exp(-delta / 0.22);
     lag = Math.min(Math.max(lag, -400), 400);
-    if (reducedMotion || Math.abs(lag) < 0.1) lag = 0;
+    if (reducedMotion || disabledAfterBottom || Math.abs(lag) < 0.1) lag = 0;
     if (!introDone) {
       if (reducedMotion || !htmlInCanvas) introDone = true;
       else if (introReady) {
