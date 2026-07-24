@@ -264,6 +264,7 @@ export function createParticleScroll(
     typeof sourceCtx.drawElementImage === "function" &&
     typeof paintable.requestPaint === "function",
   );
+  let captureDpr = 1;
 
   let contentDirty = false;
   let wake = () => {};
@@ -272,6 +273,7 @@ export function createParticleScroll(
     paintable.onpaint = () => {
       try {
         sourceCtx!.reset();
+        sourceCtx!.scale(captureDpr, captureDpr);
         sourceCtx!.drawElementImage!(content, 0, 0);
         contentDirty = true;
         wake();
@@ -400,9 +402,12 @@ export function createParticleScroll(
     if (htmlInCanvas) {
       const cssWidth = Math.max(1, Math.round(source.clientWidth));
       const cssHeight = Math.max(1, Math.round(source.clientHeight));
-      if (source.width !== cssWidth || source.height !== cssHeight) {
-        source.width = cssWidth;
-        source.height = cssHeight;
+      captureDpr = dpr;
+      const sourceWidth = Math.max(1, Math.round(cssWidth * captureDpr));
+      const sourceHeight = Math.max(1, Math.round(cssHeight * captureDpr));
+      if (source.width !== sourceWidth || source.height !== sourceHeight) {
+        source.width = sourceWidth;
+        source.height = sourceHeight;
       }
       paintable.requestPaint!();
     }
