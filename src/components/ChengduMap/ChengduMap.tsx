@@ -4,27 +4,9 @@ import { useEffect, useRef } from 'react';
 import type { Map as MapLibreMap, Marker as MapLibreMarker } from 'maplibre-gl';
 import styles from './ChengduMap.module.css';
 
-const NANBU: [number, number] = [106.0611, 31.3532];
-const LONGQUANYI: [number, number] = [104.2746, 30.5565];
 const CURRENT_LOCATION: [number, number] = [104.2826, 30.976];
-const MAP_CENTER: [number, number] = [105.1679, 30.9549];
 const MAP_STYLE = 'https://tiles.openfreemap.org/styles/dark';
 const announceMapReady = () => window.dispatchEvent(new Event('ender:map-ready'));
-
-const HOME_ICON = `
-  <svg viewBox="0 0 24 24" aria-hidden="true">
-    <path d="M3 10.6 12 3l9 7.6" />
-    <path d="M5.5 9.5V20h13V9.5" />
-    <path d="M9.5 20v-6h5v6" />
-  </svg>
-`;
-
-const RESIDENCE_ICON = `
-  <svg viewBox="0 0 24 24" aria-hidden="true">
-    <path d="M12 21s6.5-5.1 6.5-11A6.5 6.5 0 0 0 5.5 10c0 5.9 6.5 11 6.5 11Z" />
-    <circle cx="12" cy="10" r="2.4" />
-  </svg>
-`;
 
 export default function ChengduMap() {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -80,21 +62,13 @@ export default function ChengduMap() {
       const map = new maplibregl.Map({
         container: containerRef.current,
         style: MAP_STYLE,
-        center: MAP_CENTER,
-        zoom: 7.1,
+        center: CURRENT_LOCATION,
+        zoom: 8.4,
         pitch: 38,
         bearing: -12,
         attributionControl: false,
         scrollZoom: false,
       });
-
-      const createIconMarker = (className: string, label: string, icon: string) => {
-        const element = document.createElement('div');
-        element.className = `${styles.markerIcon} ${className}`;
-        element.setAttribute('aria-label', label);
-        element.innerHTML = icon;
-        return element;
-      };
 
       const createAvatarMarker = () => {
         const markerEl = document.createElement('div');
@@ -109,18 +83,6 @@ export default function ChengduMap() {
 
       markerRefs.current = [
         new maplibregl.Marker({
-          element: createIconMarker(styles.homeMarker, 'Birthplace marker in Nanbu, Nanchong', HOME_ICON),
-          anchor: 'center',
-        })
-          .setLngLat(NANBU)
-          .addTo(map),
-        new maplibregl.Marker({
-          element: createIconMarker(styles.residenceMarker, 'Residence marker in Longquanyi, Chengdu', RESIDENCE_ICON),
-          anchor: 'center',
-        })
-          .setLngLat(LONGQUANYI)
-          .addTo(map),
-        new maplibregl.Marker({
           element: createAvatarMarker(),
           anchor: 'bottom',
         })
@@ -128,12 +90,6 @@ export default function ChengduMap() {
           .addTo(map),
       ];
       map.once('load', () => {
-        const bounds = new maplibregl.LngLatBounds(NANBU, NANBU).extend(LONGQUANYI).extend(CURRENT_LOCATION);
-        map.fitBounds(bounds, {
-          padding: { top: 86, right: 84, bottom: 112, left: 84 },
-          duration: 900,
-          maxZoom: 7.4,
-        });
         map.once('idle', () => {
           startAutoZoom(map);
           announceMapReady();
