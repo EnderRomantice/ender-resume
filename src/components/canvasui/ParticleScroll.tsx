@@ -646,8 +646,16 @@ export function createParticleScroll(
   wake = start;
   start();
 
+  let paintRequested = false;
+
   function onScroll() {
-    if (htmlInCanvas) paintable.requestPaint!();
+    if (htmlInCanvas && !paintRequested) {
+      paintRequested = true;
+      requestAnimationFrame(() => {
+        paintRequested = false;
+        if (!destroyed) paintable.requestPaint!();
+      });
+    }
     start();
   }
   content.addEventListener("scroll", onScroll, { passive: true });
@@ -717,6 +725,7 @@ export function ParticleScroll({
   style,
   ...options
 }: ParticleScrollProps) {
+  const rootRef = useRef<HTMLDivElement>(null);
   const sourceRef = useRef<HTMLCanvasElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const outputRef = useRef<HTMLCanvasElement>(null);
@@ -751,8 +760,58 @@ export function ParticleScroll({
     instanceRef.current?.setOptions(options);
   });
 
+  useEffect(() => {
+    if (!native) return;
+
+    const root = rootRef.current;
+    const content = contentRef.current;
+    if (!root || !content) return;
+
+    const routeWheelToContent = (event: WheelEvent) => {
+      const rect = root.getBoundingClientRect();
+      if (
+        event.clientX < rect.left ||
+        event.clientX > rect.right ||
+        event.clientY < rect.top ||
+        event.clientY > rect.bottom
+      ) {
+        return;
+      }
+
+      const delta =
+        event.deltaMode === WheelEvent.DOM_DELTA_LINE
+          ? event.deltaY * 16
+          : event.deltaMode === WheelEvent.DOM_DELTA_PAGE
+            ? event.deltaY * content.clientHeight
+            : event.deltaY;
+      const nextTop = Math.max(
+        0,
+        Math.min(
+          content.scrollHeight - content.clientHeight,
+          content.scrollTop + delta,
+        ),
+      );
+
+      if (nextTop === content.scrollTop) return;
+      event.preventDefault();
+      content.scrollTop = nextTop;
+    };
+
+    window.addEventListener("wheel", routeWheelToContent, {
+      capture: true,
+      passive: false,
+    });
+    return () => {
+      window.removeEventListener("wheel", routeWheelToContent, true);
+    };
+  }, [native]);
+
   return (
-    <div className={className} style={{ position: "relative", ...style }}>
+    <div
+      ref={rootRef}
+      className={className}
+      style={{ position: "relative", ...style }}
+    >
       <canvas
         ref={sourceRef}
         // @ts-expect-error experimental html-in-canvas attribute

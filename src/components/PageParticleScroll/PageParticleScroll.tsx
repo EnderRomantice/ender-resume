@@ -14,7 +14,7 @@ export default function PageParticleScroll({ children }: PageParticleScrollProps
       className={styles.viewport}
       point={0.72}
       band={360}
-      density={2}
+      density={3}
       size={1.15}
       spread={150}
       gravity={0.22}
