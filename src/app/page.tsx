@@ -173,7 +173,7 @@ export default function Home() {
           </div>
 
           {EXPERIENCE.map((job) => (
-            <article key={job.company} className={styles.role}>
+            <article key={job.company} className={styles.role} data-scroll-reveal>
               <aside className={styles.roleAside}>
                 <div className={`${styles.logoBox} ${job.logoDark ? styles.logoBoxDark : ""}`}>
                   <Image src={job.logo} alt={`${job.company} logo`} width={30} height={30} />
@@ -207,12 +207,13 @@ export default function Home() {
 
           <div className={styles.osGrid}>
             {OPEN_SOURCE.map((p) => (
-              <article key={p.name} className={styles.osCard}>
+              <article key={p.name} className={styles.osCard} data-scroll-reveal>
                 <div className={styles.osPreview}>
                   <iframe
                     src={p.preview}
                     title={`${p.name} website preview`}
                     loading="lazy"
+                    scrolling="no"
                     sandbox="allow-scripts allow-same-origin"
                     referrerPolicy="no-referrer"
                   />
@@ -251,7 +252,7 @@ export default function Home() {
           </div>
           <div className={styles.skillGroups}>
             {SKILL_GROUPS.map((group) => (
-              <div key={group.group} className={styles.skillGroup}>
+              <div key={group.group} className={styles.skillGroup} data-scroll-reveal>
                 <h3>{group.group}</h3>
                 <div className={styles.skills}>
                   {group.skills.map((s) => (

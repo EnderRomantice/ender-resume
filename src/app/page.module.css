@@ -298,12 +298,22 @@
 
 /* ---------- Open source ---------- */
 .osGrid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  display: flex;
+  gap: 22px;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  padding: 2px 1px 18px;
+}
+
+.osGrid::-webkit-scrollbar {
+  display: none;
 }
 
 .osCard {
+  flex: 0 0 clamp(620px, 72vw, 760px);
+  scroll-snap-align: start;
   border: 1px solid var(--line);
   border-radius: 16px;
   overflow: hidden;
@@ -319,7 +329,7 @@
 
 .osPreview {
   position: relative;
-  height: 280px;
+  height: 360px;
   overflow: hidden;
   background: #f5f5f5;
   border-bottom: 1px solid var(--line);
@@ -329,7 +339,7 @@
   position: relative;
   z-index: 2;
   width: 200%;
-  height: 560px;
+  height: 720px;
   border: 0;
   background: #fff;
   transform: scale(0.5);
@@ -338,7 +348,7 @@
 
 .osContent {
   min-height: 220px;
-  padding: 22px 24px 24px;
+  padding: 26px 28px 28px;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -504,7 +514,21 @@
   }
 
   .osGrid {
-    grid-template-columns: 1fr;
+    gap: 14px;
+    margin-right: -32px;
+    padding-right: 32px;
+  }
+
+  .osCard {
+    flex-basis: min(86vw, 620px);
+  }
+
+  .osPreview {
+    height: 270px;
+  }
+
+  .osPreview iframe {
+    height: 540px;
   }
 
   .skillGroups {

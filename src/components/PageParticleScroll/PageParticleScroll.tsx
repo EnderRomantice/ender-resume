@@ -27,6 +27,9 @@ export default function PageParticleScroll({ children }: PageParticleScrollProps
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const particles: Particle[] = [];
+    const revealTargets = Array.from(
+      document.querySelectorAll<HTMLElement>("[data-scroll-reveal]"),
+    );
     let frame = 0;
     let previousScroll = window.scrollY;
 
@@ -90,7 +93,25 @@ export default function PageParticleScroll({ children }: PageParticleScrollProps
     window.addEventListener("resize", resize);
     window.addEventListener("scroll", handleScroll, { passive: true });
 
+    const revealObserver = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          (entry.target as HTMLElement).dataset.scrollVisible = String(entry.isIntersecting);
+        }
+      },
+      {
+        rootMargin: "-6% 0px -8%",
+        threshold: 0.12,
+      },
+    );
+
+    for (const target of revealTargets) {
+      if (reducedMotion.matches) target.dataset.scrollVisible = "true";
+      else revealObserver.observe(target);
+    }
+
     return () => {
+      revealObserver.disconnect();
       window.removeEventListener("resize", resize);
       window.removeEventListener("scroll", handleScroll);
       window.cancelAnimationFrame(frame);
