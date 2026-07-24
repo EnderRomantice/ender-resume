@@ -1,6 +1,9 @@
 .shell {
   width: 100%;
-  min-height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .container {
@@ -335,15 +338,14 @@
   border-bottom: 1px solid var(--line);
 }
 
-.osPreview iframe {
-  position: relative;
-  z-index: 2;
-  width: 200%;
-  height: 720px;
-  border: 0;
-  background: #fff;
-  transform: scale(0.5);
-  transform-origin: top left;
+.osPreview img {
+  object-fit: cover;
+  object-position: top center;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.osPreview:hover img {
+  transform: scale(1.025);
 }
 
 .osContent {
@@ -525,10 +527,6 @@
 
   .osPreview {
     height: 270px;
-  }
-
-  .osPreview iframe {
-    height: 540px;
   }
 
   .skillGroups {

@@ -63,6 +63,7 @@ const OPEN_SOURCE = [
     desc: "Contributed animation components, examples, fixes, and DX improvements to a widely used React animation library.",
     href: "https://github.com/DavidHDev/react-bits",
     preview: "https://reactbits.dev/",
+    previewImage: "/previews/react-bits.png",
     stars: "42.4k",
   },
   {
@@ -71,6 +72,7 @@ const OPEN_SOURCE = [
     desc: "Led project direction, component API design, examples, issue triage, and release maintenance for Vue drag interactions.",
     href: "https://github.com/EnderRomantice/vue-grab",
     preview: "https://vue-grab.vercel.app/",
+    previewImage: "/previews/vue-grab.png",
     stars: "88",
   },
   {
@@ -79,6 +81,7 @@ const OPEN_SOURCE = [
     desc: "Improved developer-tooling workflows, package behavior, documentation, and contributor experience in the npm ecosystem.",
     href: "https://github.com/antfu/skills-npm",
     preview: "https://www.jsdelivr.com/package/npm/skills-npm",
+    previewImage: "/previews/skills-npm.png",
     stars: "479",
   },
 ];
@@ -173,7 +176,7 @@ export default function Home() {
           </div>
 
           {EXPERIENCE.map((job) => (
-            <article key={job.company} className={styles.role} data-scroll-reveal>
+            <article key={job.company} className={styles.role}>
               <aside className={styles.roleAside}>
                 <div className={`${styles.logoBox} ${job.logoDark ? styles.logoBoxDark : ""}`}>
                   <Image src={job.logo} alt={`${job.company} logo`} width={30} height={30} />
@@ -207,17 +210,21 @@ export default function Home() {
 
           <div className={styles.osGrid}>
             {OPEN_SOURCE.map((p) => (
-              <article key={p.name} className={styles.osCard} data-scroll-reveal>
-                <div className={styles.osPreview}>
-                  <iframe
-                    src={p.preview}
-                    title={`${p.name} website preview`}
-                    loading="lazy"
-                    scrolling="no"
-                    sandbox="allow-scripts allow-same-origin"
-                    referrerPolicy="no-referrer"
+              <article key={p.name} className={styles.osCard}>
+                <a
+                  className={styles.osPreview}
+                  href={p.preview}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={`Open ${p.name} website`}
+                >
+                  <Image
+                    src={p.previewImage}
+                    alt={`${p.name} website preview`}
+                    fill
+                    sizes="(max-width: 860px) 86vw, 760px"
                   />
-                </div>
+                </a>
                 <div className={styles.osContent}>
                   <div className={styles.osTop}>
                     <span className={styles.osRank}>{p.rank}</span>
@@ -252,7 +259,7 @@ export default function Home() {
           </div>
           <div className={styles.skillGroups}>
             {SKILL_GROUPS.map((group) => (
-              <div key={group.group} className={styles.skillGroup} data-scroll-reveal>
+              <div key={group.group} className={styles.skillGroup}>
                 <h3>{group.group}</h3>
                 <div className={styles.skills}>
                   {group.skills.map((s) => (

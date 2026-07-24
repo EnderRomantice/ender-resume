@@ -1,42 +1,11 @@
 .viewport {
-  position: relative;
+  flex: 1;
+  min-height: 0;
   background: var(--bg);
 }
 
-.particles {
-  position: fixed;
-  z-index: 40;
-  inset: 0;
-  display: block;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-
-.viewport :global([data-scroll-reveal]) {
-  --scroll-progress: 0;
-  opacity: var(--scroll-progress);
-  filter: blur(calc((1 - var(--scroll-progress)) * 3px));
-  transform:
-    translateY(calc((1 - var(--scroll-progress)) * 16px))
-    scale(calc(0.992 + (var(--scroll-progress) * 0.008)));
-  transition:
-    opacity 0.18s linear,
-    filter 0.28s linear,
-    transform 0.28s linear;
-  will-change: opacity, filter, transform;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .particles {
-    display: none;
-  }
-
-  .viewport :global([data-scroll-reveal]) {
-    --scroll-progress: 1;
-    opacity: 1;
-    filter: none;
-    transform: none;
-    transition: none;
+  .viewport {
+    scroll-behavior: auto;
   }
 }
