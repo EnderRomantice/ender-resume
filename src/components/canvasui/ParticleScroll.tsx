@@ -74,7 +74,11 @@ type PaintableCanvas = HTMLCanvasElement & {
 };
 
 type ElementImageContext = CanvasRenderingContext2D & {
-  drawElementImage?: (element: Element, x: number, y: number) => void;
+  drawElementImage?: (
+    element: Element,
+    x: number,
+    y: number,
+  ) => DOMMatrix | null;
 };
 
 const HASH = `
@@ -272,7 +276,8 @@ export function createParticleScroll(
     paintable.onpaint = () => {
       try {
         sourceCtx!.reset();
-        sourceCtx!.drawElementImage!(content, 0, 0);
+        const transform = sourceCtx!.drawElementImage!(content, 0, 0);
+        if (transform) content.style.transform = transform.toString();
         contentDirty = true;
         wake();
       } catch {}
@@ -398,11 +403,11 @@ export function createParticleScroll(
       Math.max(0.05, content.clientWidth / Math.max(output.clientWidth, 1)),
     );
     if (htmlInCanvas) {
-      const cssWidth = Math.max(1, Math.round(source.clientWidth));
-      const cssHeight = Math.max(1, Math.round(source.clientHeight));
-      if (source.width !== cssWidth || source.height !== cssHeight) {
-        source.width = cssWidth;
-        source.height = cssHeight;
+      const sourceWidth = Math.max(1, Math.round(source.clientWidth * dpr));
+      const sourceHeight = Math.max(1, Math.round(source.clientHeight * dpr));
+      if (source.width !== sourceWidth || source.height !== sourceHeight) {
+        source.width = sourceWidth;
+        source.height = sourceHeight;
       }
       paintable.requestPaint!();
     }
