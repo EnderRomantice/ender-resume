@@ -758,6 +758,10 @@ export function ParticleScroll({
   const native = supported && !failed;
 
   useEffect(() => {
+    // Without HTML-in-canvas support the children are rendered as ordinary
+    // scrollable DOM. Do not initialise the canvas effect for that fallback.
+    if (!native) return;
+
     const source = sourceRef.current;
     const content = contentRef.current;
     const output = outputRef.current;
@@ -858,10 +862,11 @@ export function ParticleScroll({
         <div
           ref={contentRef}
           style={{
-            position: "relative",
-            width: "100%",
-            height: "100%",
+            position: "absolute",
+            inset: 0,
             overflow: "auto",
+            overscrollBehavior: "contain",
+            WebkitOverflowScrolling: "touch",
           }}
         >
           {children}
@@ -871,6 +876,7 @@ export function ParticleScroll({
         ref={outputRef}
         aria-hidden
         style={{
+          display: native ? "block" : "none",
           position: "absolute",
           inset: 0,
           width: "100%",
