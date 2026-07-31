@@ -782,8 +782,6 @@ export function ParticleScroll({
   });
 
   useEffect(() => {
-    if (!native) return;
-
     const root = rootRef.current;
     const content = contentRef.current;
     if (!root || !content) return;

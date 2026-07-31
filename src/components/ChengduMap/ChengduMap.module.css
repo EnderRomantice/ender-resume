@@ -72,11 +72,13 @@
 
 .plate {
   position: absolute;
-  left: 24px;
+  right: 24px;
   top: 22px;
   z-index: 2;
   display: grid;
+  justify-items: end;
   gap: 7px;
+  text-align: right;
   color: var(--panel-ink);
   pointer-events: none;
 }
@@ -122,7 +124,7 @@
 
 @media (max-width: 860px) {
   .plate {
-    left: 20px;
+    right: 20px;
     top: 20px;
   }
 }

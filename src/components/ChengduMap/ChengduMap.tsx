@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react';
 import type { Map as MapLibreMap, Marker as MapLibreMarker } from 'maplibre-gl';
 import styles from './ChengduMap.module.css';
 
-const CURRENT_LOCATION: [number, number] = [104.2826, 30.976];
+const CURRENT_LOCATION: [number, number] = [104.2746, 30.5565];
 const MAP_STYLE = 'https://tiles.openfreemap.org/styles/dark';
 const announceMapReady = () => window.dispatchEvent(new Event('ender:map-ready'));
 
@@ -73,7 +73,7 @@ export default function ChengduMap() {
       const createAvatarMarker = () => {
         const markerEl = document.createElement('div');
         markerEl.className = styles.marker;
-        markerEl.setAttribute('aria-label', 'Current location avatar marker in Guanghan, Sichuan');
+        markerEl.setAttribute('aria-label', 'Current location avatar marker in Longquanyi, Chengdu');
         const avatar = document.createElement('img');
         avatar.src = '/ender.jpg';
         avatar.alt = '';
@@ -112,13 +112,13 @@ export default function ChengduMap() {
   }, []);
 
   return (
-    <div className={styles.mapShell} aria-label="Map centered on Guanghan, Sichuan, China">
+    <div className={styles.mapShell} aria-label="Map centered on Longquanyi, Chengdu, China">
       <div className={styles.loading}>Loading Chengdu map</div>
       <div ref={containerRef} className={styles.map} />
       <div className={styles.plate}>
         <span className={styles.kicker}>Currently based in</span>
-        <span className={styles.city}>Guanghan, Sichuan</span>
-        <span className={styles.coords}>30.9760 N · 104.2826 E</span>
+        <span className={styles.city}>Longquanyi, Chengdu</span>
+        <span className={styles.coords}>30.5565 N · 104.2746 E</span>
       </div>
     </div>
   );
