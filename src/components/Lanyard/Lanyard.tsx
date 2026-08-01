@@ -67,54 +67,6 @@ export default function Lanyard({
   passThrough = false
 }: LanyardProps) {
   const [isMobile, setIsMobile] = useState<boolean>(() => typeof window !== 'undefined' && window.innerWidth < 768);
-  // Guards against re-entry: a forwarded click bubbles to the document where R3F's
-  // own miss handler would catch it and re-trigger onPointerMissed in a loop.
-  const forwardingClick = useRef(false);
-  // The badge's live screen-space box (updated each frame by <Band>). In
-  // passThrough mode the canvas only captures pointer events when the cursor is
-  // inside this box (or a drag is in progress), so hover/clicks pass through to
-  // the page everywhere else.
-  const interaction = useRef<InteractionZone>({ x: 0, y: 0, w: 0, h: 0, active: false, dragging: false });
-  const interactionApi = useMemo<InteractionApi>(
-    () => ({
-      setDragging: (dragging: boolean) => {
-        interaction.current = { ...interaction.current, dragging };
-      },
-      setZone: (zone: Omit<InteractionZone, 'dragging'>) => {
-        interaction.current = { ...interaction.current, ...zone };
-      },
-    }),
-    []
-  );
-  const canvasElRef = useRef<HTMLCanvasElement | null>(null);
-
-  useEffect(() => {
-    if (!passThrough) return;
-    const setCanvasHitTesting = (enabled: boolean): void => {
-      const el = canvasElRef.current;
-      if (el) el.style.pointerEvents = enabled ? 'auto' : 'none';
-    };
-    const onMove = (ev: PointerEvent): void => {
-      const z = interaction.current;
-      const inside =
-        z.active && ev.clientX >= z.x && ev.clientX <= z.x + z.w && ev.clientY >= z.y && ev.clientY <= z.y + z.h;
-      setCanvasHitTesting(inside || z.dragging);
-    };
-    const onPointerUp = (): void => {
-      interaction.current = { ...interaction.current, dragging: false };
-      setCanvasHitTesting(false);
-    };
-    const onBlur = (): void => setCanvasHitTesting(false);
-    window.addEventListener('pointermove', onMove, { passive: true });
-    window.addEventListener('pointerup', onPointerUp, { passive: true });
-    window.addEventListener('blur', onBlur);
-    return () => {
-      window.removeEventListener('pointermove', onMove);
-      window.removeEventListener('pointerup', onPointerUp);
-      window.removeEventListener('blur', onBlur);
-    };
-  }, [passThrough]);
-
   useEffect(() => {
     const handleResize = (): void => setIsMobile(window.innerWidth < 768);
     window.addEventListener('resize', handleResize);
@@ -127,37 +79,11 @@ export default function Lanyard({
         camera={{ position, fov }}
         dpr={[1, isMobile ? 1.5 : 2]}
         gl={{ alpha: transparent }}
-        // In passThrough mode the canvas itself stays interactive (so the badge
-        // drags reliably in every browser), but a click that MISSES the badge is
-        // re-dispatched to the element underneath — so the page stays usable.
-        onPointerMissed={
-          passThrough
-            ? (e: MouseEvent) => {
-                if (typeof document === 'undefined' || forwardingClick.current) return;
-                const target = e.target as HTMLElement | null;
-                // Disable the whole lanyard overlay for one hit-test so we can find
-                // the element underneath and re-dispatch the click to it.
-                const wrapper = target?.closest?.('.lanyard-wrapper') as HTMLElement | null;
-                const overlay = (wrapper?.parentElement as HTMLElement | null) ?? wrapper;
-                if (!overlay) return;
-                // Walk the full stack at the point and take the first element that
-                // isn't part of the lanyard overlay — that's the page underneath.
-                const stack = document.elementsFromPoint(e.clientX, e.clientY) as HTMLElement[];
-                const below = stack.find((el) => !overlay.contains(el));
-                if (below) {
-                  forwardingClick.current = true;
-                  below.dispatchEvent(
-                    new MouseEvent('click', { bubbles: true, cancelable: true, view: window, clientX: e.clientX, clientY: e.clientY })
-                  );
-                  forwardingClick.current = false;
-                }
-              }
-            : undefined
-        }
         onCreated={({ gl }) => {
           gl.setClearColor(new THREE.Color(0x000000), transparent ? 0 : 1);
           if (passThrough) {
-            canvasElRef.current = gl.domElement;
+            // Keep the full-size render surface completely transparent to page
+            // input. WebGL rendering and physics continue without DOM hit tests.
             gl.domElement.style.pointerEvents = 'none';
           }
         }}
@@ -173,7 +99,7 @@ export default function Lanyard({
             lanyardImage={lanyardImage}
             lanyardWidth={lanyardWidth}
             onPull={onPull}
-            interaction={passThrough ? interactionApi : undefined}
+            interaction={undefined}
           />
           </Physics>
           <Environment blur={0.75}>
