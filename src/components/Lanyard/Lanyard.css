@@ -14,4 +14,7 @@
 .lanyard-wrapper canvas {
   cursor: grab;
   pointer-events: none;
+  /* Keep vertical page gestures native when the pass-through canvas is
+     temporarily enabled over the draggable badge. */
+  touch-action: pan-y;
 }
