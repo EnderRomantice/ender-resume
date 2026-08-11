@@ -1,29 +1,83 @@
-/* Large fixed region on the right where the badge hangs from the tabbar.
-   pointer-events is off (the canvas passes clicks through); only the 3D badge
-   is interactive, so the rest of the page stays fully usable. It sits below
-   the nav (z 50) so the band appears to hang from the tabbar. */
-.overlay {
-  position: fixed;
-  /* Pull the canvas up so the top of the strap tucks behind the nav (the band
-     hangs ~12% down the canvas; this offset closes the gap to the tabbar). */
-  top: -70px;
-  right: 0;
-  width: 82vw;
-  height: calc(100vh + 70px);
-  z-index: 45;
-  /* The overlay never captures events; the canvas inside toggles its own
-     pointer-events so it only intercepts when the cursor is over the badge
-     (hover/clicks pass through everywhere else). */
+.hanger {
+  --panel-open-dur: 650ms;
+  --panel-close-dur: 350ms;
+  --panel-translate-y: -70px;
+  --panel-blur: 2px;
+  --panel-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  position: absolute;
+  top: -83px;
+  right: -230px;
+  width: min(62vw, 690px);
+  height: 620px;
+  z-index: 4;
+  overflow: hidden;
   pointer-events: none;
-  transition: transform 0.52s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translateY(var(--panel-translate-y));
+  opacity: 0;
+  filter: blur(var(--panel-blur));
+  transition:
+    transform var(--panel-close-dur) var(--panel-ease),
+    opacity var(--panel-close-dur) var(--panel-ease),
+    filter var(--panel-close-dur) var(--panel-ease);
+  will-change: transform, opacity, filter;
 }
 
-.overlayVisible {
-  opacity: 1;
+/* The separator stays behind the left half of the ring. Only this short right
+   segment sits in front, so the line appears to pass through the metal loop. */
+.hanger::after {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  top: 83px;
+  left: 50%;
+  width: 12px;
+  height: 1px;
+  background: var(--line);
+  pointer-events: none;
+}
+
+.hanger[data-open="true"] {
   transform: translateY(0);
+  opacity: 1;
+  filter: blur(0);
+  transition:
+    transform var(--panel-open-dur) var(--panel-ease),
+    opacity var(--panel-open-dur) var(--panel-ease),
+    filter var(--panel-open-dur) var(--panel-ease);
 }
 
-.overlayHidden {
-  opacity: 1;
-  transform: translateY(calc(-100vh - 90px));
+@media (max-width: 860px) {
+  .hanger {
+    top: -67px;
+    right: -44vw;
+    width: 100vw;
+    height: 500px;
+  }
+
+  .hanger::after {
+    top: 67px;
+  }
+}
+
+@media (max-width: 560px) {
+  .hanger {
+    top: -57px;
+    right: -60vw;
+    height: 420px;
+    opacity: 0;
+  }
+
+  .hanger::after {
+    top: 57px;
+  }
+
+  .hanger[data-open="true"] {
+    opacity: 0.65;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hanger {
+    transition: none !important;
+  }
 }

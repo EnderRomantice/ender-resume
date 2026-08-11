@@ -1,0 +1,69 @@
+.stage {
+  --duration-fast: 250ms;
+  --duration-slow: 400ms;
+  --duration-very-slow: 500ms;
+  --ease-smooth-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --text-swap-dur: 400ms;
+  --text-swap-translate-y: 4px;
+  --text-swap-blur: 2px;
+  --text-swap-ease: ease-in-out;
+  --shimmer-dur: 1400ms;
+  --shimmer-base: #9a9a96;
+  --shimmer-highlight: #111;
+  --shimmer-band: 400%;
+  --shimmer-ease: linear;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #050505;
+  transition: background-color 1100ms ease-in-out;
+}
+
+.stage.ready,
+.stage.thinking,
+.stage.answer { background: #fff; }
+
+.mapEntry { position: absolute; inset: 0; width: 100%; border: 0; padding: 0; background: #050505; color: #fff; cursor: pointer; text-align: left; }
+
+.pixelTransition { position: absolute; inset: 0; z-index: 8; display: grid; grid-template-columns: repeat(12,1fr); grid-template-rows: repeat(12,1fr); pointer-events: none; }
+.pixelTransition i { --pixel-delay: 0ms; --pixel-exit-delay: 0ms; min-width: 0; min-height: 0; background: #fff; opacity: 0; transform: scale(.2); filter: blur(2px); will-change: transform,opacity,filter; animation: pixel-cover-in 220ms var(--ease-smooth-out) var(--pixel-delay) forwards, pixel-cover-out 260ms var(--ease-smooth-out) calc(980ms + var(--pixel-exit-delay)) forwards; }
+.pixelTransitionDark i { background: #050505; }
+
+.whiteboard { position: absolute; inset: 0; width: 100%; height: 100%; display: grid; place-items: center; padding: clamp(28px,5vw,68px); color: #111; background: #fff; }
+.workspace { position: relative; width: min(100%,590px); display: grid; gap: 34px; }
+.responseArea { display: grid; min-height: 0; }
+.workspace:not(.hasResponse) .responseArea { display: none; }
+.askForm { width: 100%; animation: content-in var(--duration-very-slow) var(--ease-smooth-out) 300ms both; }
+.hasResponse .askForm textarea { min-height: 46px; font-size: 18px; }
+.askForm label { display: block; margin-bottom: 32px; font: 500 clamp(22px,2.7vw,34px)/1.12 var(--font-display), Georgia, serif; color: #171717; }
+.askForm textarea { width: 100%; min-height: 78px; resize: none; border: 0; outline: 0; background: transparent; color: #111; font: 400 clamp(18px,2vw,26px)/1.35 var(--font-display), Georgia, serif; }
+.inputRule { height: 1px; background: #bdbdb8; transform-origin: left; animation: rule-in 700ms var(--ease-smooth-out) 440ms both; }
+.formBottom { display: flex; justify-content: space-between; align-items: center; padding-top: 13px; }
+.formBottom em { color: #999; font: italic 13px/1.2 var(--font-display), Georgia, serif; letter-spacing: .02em; }
+.formBottom button { width: 34px; height: 34px; border: 1px solid #d3d3cf; border-radius: 50%; background: #fff; color: #111; font-size: 16px; cursor: pointer; transition: background-color var(--duration-quick,150ms), color var(--duration-quick,150ms), transform var(--duration-fast) var(--ease-smooth-out); }
+.formBottom button:hover:not(:disabled) { background: #111; color: #fff; transform: translate(2px,-2px); }
+.formBottom button:disabled { opacity: .25; cursor: default; }
+.error { margin-top: 18px; color: #9b3b34; font-size: 12px; }
+
+.loadingState { position: absolute; left: 0; top: -34px; z-index: 2; display: flex; width: fit-content; align-items: center; gap: 10px; min-height: 24px; pointer-events: none; }
+.pixelGrid { display: grid; grid-template-columns: repeat(3,4px); gap: 1.5px; }
+.pixelGrid i { width: 4px; height: 4px; border-radius: 1px; background: #111; opacity: .15; animation: pixel-on 650ms ease-in-out infinite; }
+.shimmerLabel { position: relative; display: inline-block; color: var(--shimmer-base); font-size: 13px; font-weight: 500; }
+.shimmerLabel::before { content: attr(data-text); position: absolute; inset: 0; pointer-events: none; background-image: linear-gradient(90deg,transparent 0%,transparent 40%,var(--shimmer-highlight) 50%,transparent 60%,transparent 100%); background-size: var(--shimmer-band) 100%; background-repeat: no-repeat; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; animation: t-shimmer var(--shimmer-dur) var(--shimmer-ease) infinite; }
+.elapsed { color: #999; font: 12px/1 var(--font-geist-mono),monospace; font-variant-numeric: tabular-nums; }
+
+.answer { width: 100%; padding: 0; transform: translateY(0); filter: blur(0); opacity: 1; transition: transform var(--text-swap-dur) var(--text-swap-ease), filter var(--text-swap-dur) var(--text-swap-ease), opacity var(--text-swap-dur) var(--text-swap-ease); will-change: transform,filter,opacity; }
+.answerExit { transform: translateY(calc(var(--text-swap-translate-y) * -1)); filter: blur(var(--text-swap-blur)); opacity: .18; }
+.answerEnter { animation: answer-enter var(--text-swap-dur) var(--text-swap-ease) both; }
+.answer p { white-space: pre-line; color: #202020; font: 400 clamp(16px,1.45vw,20px)/1.7 var(--font-display),Georgia,serif; }
+
+@keyframes pixel-cover-in { to { opacity: 1; transform: scale(1.03); filter: blur(0); } }
+@keyframes pixel-cover-out { from { opacity: 1; transform: scale(1.03); filter: blur(0); } to { opacity: 0; transform: scale(.15); filter: blur(2px); } }
+@keyframes content-in { from { opacity: 0; filter: blur(3px); transform: translateY(12px); } to { opacity: 1; filter: blur(0); transform: translateY(0); } }
+@keyframes rule-in { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes pixel-on { 0%,100% { opacity: .15; transform: scale(1); } 45% { opacity: 1; transform: scale(1.18); } }
+@keyframes t-shimmer { from { background-position: 100% 0; } to { background-position: 0% 0; } }
+@keyframes answer-enter { from { transform: translateY(var(--text-swap-translate-y)); filter: blur(var(--text-swap-blur)); opacity: 0; } to { transform: translateY(0); filter: blur(0); opacity: 1; } }
+
+@media (max-width: 860px) { .stage { position: relative; min-height: 520px; } .whiteboard { padding: 34px 28px; } }
+@media (prefers-reduced-motion: reduce) { .stage,.mapEntry,.whiteboard,.askForm,.inputRule,.answer { animation-duration: 1ms !important; animation-delay: 0ms !important; transition-duration: 1ms !important; } .pixelTransition i { animation-duration: 1ms,1ms !important; animation-delay: 0ms,2ms !important; } .pixelGrid i,.shimmerLabel::before { animation: none !important; } }

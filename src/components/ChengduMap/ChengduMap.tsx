@@ -116,7 +116,6 @@ export default function ChengduMap() {
       <div className={styles.loading}>Loading Chengdu map</div>
       <div ref={containerRef} className={styles.map} />
       <div className={styles.plate}>
-        <span className={styles.kicker}>Currently based in</span>
         <span className={styles.city}>Longquanyi, Chengdu</span>
         <span className={styles.coords}>30.5565 N · 104.2746 E</span>
       </div>

@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Cormorant_Garamond, Geist, Geist_Mono } from "next/font/google";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./globals.css";
-import GlobalLanyard from "@/components/Lanyard/GlobalLanyard";
 import GlobalLoadingScreen from "@/components/LoadingScreen/GlobalLoadingScreen";
 
 const geistSans = Geist({
@@ -36,7 +35,6 @@ export default function RootLayout({
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${cormorant.variable}`}>
       <body>
         {children}
-        <GlobalLanyard />
         <GlobalLoadingScreen />
       </body>
     </html>

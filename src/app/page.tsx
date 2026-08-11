@@ -1,6 +1,7 @@
 import Image from "next/image";
-import ChengduMap from "@/components/ChengduMap/ChengduMap";
 import PageParticleScroll from "@/components/PageParticleScroll/PageParticleScroll";
+import PortfolioAgent from "@/components/PortfolioAgent/PortfolioAgent";
+import GlobalLanyard from "@/components/Lanyard/GlobalLanyard";
 import styles from "./page.module.css";
 
 const EMAIL = "enderromantic@gmail.com";
@@ -163,7 +164,7 @@ export default function Home() {
         </div>
 
         <div className={styles.heroRight}>
-          <ChengduMap />
+          <PortfolioAgent />
         </div>
         </header>
 
@@ -171,12 +172,12 @@ export default function Home() {
         {/* Experience */}
         <section id="experience" className={styles.section}>
           <div className={styles.sectionHead}>
-            <span className={styles.sectionIndex}>01</span>
             <h2 className={styles.sectionTitle}>Experience</h2>
           </div>
 
           {EXPERIENCE.map((job) => (
-            <article key={job.company} className={styles.role}>
+            <article key={job.company} className={`${styles.role} ${job.company === "GoldMiner" ? styles.lanyardRole : ""}`}>
+              {job.company === "GoldMiner" && <GlobalLanyard />}
               <aside className={styles.roleAside}>
                 <div className={`${styles.logoBox} ${job.logoDark ? styles.logoBoxDark : ""}`}>
                   <Image src={job.logo} alt={`${job.company} logo`} width={30} height={30} />
@@ -204,7 +205,6 @@ export default function Home() {
         {/* Open source */}
         <section id="open-source" className={styles.section}>
           <div className={styles.sectionHead}>
-            <span className={styles.sectionIndex}>02</span>
             <h2 className={styles.sectionTitle}>Open Source</h2>
           </div>
 
@@ -254,7 +254,6 @@ export default function Home() {
         {/* Skills */}
         <section id="skills" className={styles.section}>
           <div className={styles.sectionHead}>
-            <span className={styles.sectionIndex}>03</span>
             <h2 className={styles.sectionTitle}>Skills &amp; Tools</h2>
           </div>
           <div className={styles.skillGroups}>

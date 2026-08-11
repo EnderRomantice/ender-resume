@@ -849,7 +849,8 @@ export function ParticleScroll({
               position: "relative",
               width: "100%",
               height: "100%",
-              overflow: "auto",
+              overflowX: "hidden",
+              overflowY: "auto",
             }}
           >
             {children}
@@ -862,7 +863,8 @@ export function ParticleScroll({
           style={{
             position: "absolute",
             inset: 0,
-            overflow: "auto",
+            overflowX: "hidden",
+            overflowY: "auto",
             overscrollBehavior: "contain",
             WebkitOverflowScrolling: "touch",
           }}

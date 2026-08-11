@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
-import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { Suspense, useEffect, useMemo, useRef, useState, type RefObject } from 'react';
 import { Canvas, extend, useFrame } from '@react-three/fiber';
 import { useGLTF, useTexture, Environment, Lightformer } from '@react-three/drei';
 import {
@@ -48,7 +48,14 @@ interface LanyardProps {
   backImage?: string | null;
   imageFit?: 'cover' | 'contain';
   lanyardImage?: string | null;
+  plainLanyard?: boolean;
   lanyardWidth?: number;
+  cardScale?: number;
+  ropeSegmentLength?: number;
+  maxDragDistance?: number;
+  showLanyard?: boolean;
+  interactive?: boolean;
+  swayOnScroll?: boolean;
   onPull?: () => void;
   passThrough?: boolean;
 }
@@ -62,16 +69,55 @@ export default function Lanyard({
   backImage = null,
   imageFit = 'cover',
   lanyardImage = null,
+  plainLanyard = false,
   lanyardWidth = 1,
+  cardScale = 2.25,
+  ropeSegmentLength = 1,
+  maxDragDistance,
+  showLanyard = true,
+  interactive = true,
+  swayOnScroll = false,
   onPull,
   passThrough = false
 }: LanyardProps) {
   const [isMobile, setIsMobile] = useState<boolean>(() => typeof window !== 'undefined' && window.innerWidth < 768);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const interactionZoneRef = useRef<InteractionZone>({ x: 0, y: 0, w: 0, h: 0, active: false, dragging: false });
+  const interaction = useMemo<InteractionApi>(() => ({
+    setDragging: (dragging) => {
+      interactionZoneRef.current.dragging = dragging;
+      if (canvasRef.current) canvasRef.current.style.pointerEvents = dragging ? 'auto' : 'none';
+    },
+    setZone: (zone) => {
+      interactionZoneRef.current = { ...zone, dragging: interactionZoneRef.current.dragging };
+    },
+  }), []);
+
   useEffect(() => {
     const handleResize = (): void => setIsMobile(window.innerWidth < 768);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  useEffect(() => {
+    if (!passThrough) return;
+
+    const updateHitArea = (event: PointerEvent) => {
+      const canvas = canvasRef.current;
+      const zone = interactionZoneRef.current;
+      if (!canvas || zone.dragging) return;
+      const isInside = zone.active &&
+        event.clientX >= zone.x && event.clientX <= zone.x + zone.w &&
+        event.clientY >= zone.y && event.clientY <= zone.y + zone.h;
+      canvas.style.pointerEvents = isInside ? 'auto' : 'none';
+    };
+
+    window.addEventListener('pointermove', updateHitArea, { capture: true, passive: true });
+    return () => {
+      window.removeEventListener('pointermove', updateHitArea, { capture: true });
+      if (canvasRef.current) canvasRef.current.style.pointerEvents = 'none';
+    };
+  }, [passThrough]);
 
   return (
     <div className="lanyard-wrapper">
@@ -80,6 +126,7 @@ export default function Lanyard({
         dpr={[1, isMobile ? 1.5 : 2]}
         gl={{ alpha: transparent }}
         onCreated={({ gl }) => {
+          canvasRef.current = gl.domElement;
           gl.setClearColor(new THREE.Color(0x000000), transparent ? 0 : 1);
           if (passThrough) {
             // Keep the full-size render surface completely transparent to page
@@ -97,9 +144,16 @@ export default function Lanyard({
             backImage={backImage}
             imageFit={imageFit}
             lanyardImage={lanyardImage}
+            plainLanyard={plainLanyard}
             lanyardWidth={lanyardWidth}
+            cardScale={cardScale}
+            ropeSegmentLength={ropeSegmentLength}
+            maxDragDistance={maxDragDistance}
+            showLanyard={showLanyard}
+            interactive={interactive}
+            swayOnScroll={swayOnScroll}
             onPull={onPull}
-            interaction={undefined}
+            interaction={passThrough && interactive ? interaction : undefined}
           />
           </Physics>
           <Environment blur={0.75}>
@@ -146,9 +200,53 @@ interface BandProps {
   backImage?: string | null;
   imageFit?: 'cover' | 'contain';
   lanyardImage?: string | null;
+  plainLanyard?: boolean;
   lanyardWidth?: number;
+  cardScale?: number;
+  ropeSegmentLength?: number;
+  maxDragDistance?: number;
+  showLanyard?: boolean;
+  interactive?: boolean;
+  swayOnScroll?: boolean;
   onPull?: () => void;
   interaction?: InteractionApi;
+}
+
+function RopeJoints({
+  fixed,
+  j1,
+  j2,
+  j3,
+  card,
+  segmentLength,
+  cardAttachmentY,
+}: {
+  fixed: RefObject<any>;
+  j1: RefObject<any>;
+  j2: RefObject<any>;
+  j3: RefObject<any>;
+  card: RefObject<any>;
+  segmentLength: number;
+  cardAttachmentY: number;
+}) {
+  useRopeJoint(fixed, j1, [[0, 0, 0], [0, 0, 0], segmentLength]);
+  useRopeJoint(j1, j2, [[0, 0, 0], [0, 0, 0], segmentLength]);
+  useRopeJoint(j2, j3, [[0, 0, 0], [0, 0, 0], segmentLength]);
+  useSphericalJoint(j3, card, [[0, 0, 0], [0, cardAttachmentY, 0]]);
+  return null;
+}
+
+function RingJoint({
+  fixed,
+  card,
+  cardAttachmentY,
+}: {
+  fixed: RefObject<any>;
+  card: RefObject<any>;
+  cardAttachmentY: number;
+}) {
+  useSphericalJoint(fixed, card, [[0, 0, 0], [0, cardAttachmentY, 0]]);
+  return null;
 }
 
 function Band({
@@ -159,7 +257,14 @@ function Band({
   backImage = null,
   imageFit = 'cover',
   lanyardImage = null,
+  plainLanyard = false,
   lanyardWidth = 1,
+  cardScale = 2.25,
+  ropeSegmentLength = 1,
+  maxDragDistance,
+  showLanyard = true,
+  interactive = true,
+  swayOnScroll = false,
   onPull,
   interaction
 }: BandProps) {
@@ -175,6 +280,9 @@ function Band({
   const ang = new THREE.Vector3();
   const rot = new THREE.Vector3();
   const dir = new THREE.Vector3();
+  const dragTarget = new THREE.Vector3();
+  const dragOrigin = new THREE.Vector3();
+  const bandEnd = new THREE.Vector3();
 
   const segmentProps: any = {
     type: 'dynamic' as RigidBodyProps['type'],
@@ -271,6 +379,45 @@ function Band({
   // centred, onto a black strip matching the original band's layout so the
   // material's repeat tiles it down the strap exactly as before.
   const bandMap = useMemo(() => {
+    if (plainLanyard) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 64;
+      canvas.height = 64;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return texture;
+
+      const base = ctx.createLinearGradient(0, 0, canvas.width, 0);
+      base.addColorStop(0, '#090909');
+      base.addColorStop(0.5, '#1a1a1a');
+      base.addColorStop(1, '#080808');
+      ctx.fillStyle = base;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Low-contrast diagonal threads give the strap a woven nylon finish
+      // without introducing a visible logo or repeating graphic.
+      ctx.lineWidth = 1;
+      for (let offset = -64; offset < 128; offset += 6) {
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.055)';
+        ctx.beginPath();
+        ctx.moveTo(offset, 0);
+        ctx.lineTo(offset - 64, 64);
+        ctx.stroke();
+
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.22)';
+        ctx.beginPath();
+        ctx.moveTo(offset + 2, 0);
+        ctx.lineTo(offset - 62, 64);
+        ctx.stroke();
+      }
+
+      const solid = new THREE.CanvasTexture(canvas);
+      solid.colorSpace = THREE.SRGBColorSpace;
+      solid.wrapS = THREE.RepeatWrapping;
+      solid.wrapT = THREE.RepeatWrapping;
+      solid.needsUpdate = true;
+      return solid;
+    }
+
     if (!lanyardImage || !texture.image) return texture;
 
     const src = texture.image as HTMLImageElement;
@@ -313,7 +460,7 @@ function Band({
     composite.wrapT = THREE.RepeatWrapping;
     composite.needsUpdate = true;
     return composite;
-  }, [lanyardImage, texture]);
+  }, [lanyardImage, plainLanyard, texture]);
 
   const [curve] = useState(
     () => {
@@ -330,14 +477,13 @@ function Band({
   const [dragged, drag] = useState<false | THREE.Vector3>(false);
   const [hovered, hover] = useState(false);
   const pullStart = useRef<{ x: number; y: number } | null>(null);
-
-  useRopeJoint(fixed, j1, [[0, 0, 0], [0, 0, 0], 1]);
-  useRopeJoint(j1, j2, [[0, 0, 0], [0, 0, 0], 1]);
-  useRopeJoint(j2, j3, [[0, 0, 0], [0, 0, 0], 1]);
-  useSphericalJoint(j3, card, [
-    [0, 0, 0],
-    [0, 1.45, 0]
-  ]);
+  const scrollKick = useRef(0);
+  const cardScaleRatio = cardScale / 2.25;
+  // clip geometry spans y=1.1182847..1.2293701 in card.glb. The rope must
+  // terminate at the ring's upper edge, not its centre; otherwise the strap
+  // visibly enters and crosses the ring. The visual group is offset by -1.2.
+  const cardAttachmentY = -1.2 + 1.2293701 * cardScale;
+  const dragLimit = maxDragDistance ?? ropeSegmentLength * 3 + cardAttachmentY + 0.25;
 
   useEffect(() => {
     if (hovered) {
@@ -348,25 +494,69 @@ function Band({
     }
   }, [hovered, dragged]);
 
+  useEffect(() => {
+    if (!swayOnScroll) return;
+
+    let previousY: number | null = null;
+    const handleScroll = (event: Event) => {
+      const target = event.target;
+      const currentY = target instanceof Element ? target.scrollTop : window.scrollY;
+      if (previousY === null) {
+        previousY = currentY;
+        return;
+      }
+      const delta = currentY - previousY;
+      previousY = currentY;
+      if (Math.abs(delta) > 0.5) {
+        scrollKick.current = THREE.MathUtils.clamp(
+          scrollKick.current + delta * 0.00065,
+          -0.09,
+          0.09,
+        );
+      }
+    };
+
+    document.addEventListener('scroll', handleScroll, { capture: true, passive: true });
+    return () => document.removeEventListener('scroll', handleScroll, { capture: true });
+  }, [swayOnScroll]);
+
   useFrame((state, delta) => {
+    if (swayOnScroll && card.current && Math.abs(scrollKick.current) > 0.0001) {
+      card.current.wakeUp();
+      card.current.applyTorqueImpulse({ x: 0, y: 0, z: scrollKick.current }, true);
+      card.current.applyImpulse({ x: scrollKick.current * 0.18, y: 0, z: 0 }, true);
+      scrollKick.current *= Math.pow(0.08, delta);
+    }
     if (dragged && typeof dragged !== 'boolean') {
       vec.set(state.pointer.x, state.pointer.y, 0.5).unproject(state.camera);
       dir.copy(vec).sub(state.camera.position).normalize();
       vec.add(dir.multiplyScalar(state.camera.position.length()));
       [card, j1, j2, j3, fixed].forEach(ref => ref.current?.wakeUp());
-      card.current?.setNextKinematicTranslation({ x: vec.x - dragged.x, y: vec.y - dragged.y, z: vec.z - dragged.z });
+      dragTarget.set(vec.x - dragged.x, vec.y - dragged.y, vec.z - dragged.z);
+      const fixedPosition = fixed.current.translation();
+      dragOrigin.set(fixedPosition.x, fixedPosition.y, fixedPosition.z);
+      dir.copy(dragTarget).sub(dragOrigin);
+      if (dir.length() > dragLimit) dragTarget.copy(dragOrigin).add(dir.setLength(dragLimit));
+      card.current?.setNextKinematicTranslation({ x: dragTarget.x, y: dragTarget.y, z: dragTarget.z });
     }
-    if (fixed.current) {
+    if (showLanyard && fixed.current && j1.current && j2.current && j3.current) {
       [j1, j2].forEach((ref: any) => {
         if (!ref.current.lerped) ref.current.lerped = new THREE.Vector3().copy(ref.current.translation());
         const clampedDistance = Math.max(0.1, Math.min(1, ref.current.lerped.distanceTo(ref.current.translation())));
         ref.current.lerped.lerp(ref.current.translation(), delta * (minSpeed + clampedDistance * (maxSpeed - minSpeed)));
       });
-      curve.points[0].copy(j3.current.translation());
+      // MeshLine draws a cap beyond its first path point. If the visible path
+      // starts exactly at the physical joint, that cap appears to pass through
+      // the metal ring. Keep the joint on the ring, but inset the rendered end
+      // toward the preceding rope segment by roughly half the strap width.
+      bandEnd.copy(j2.current.lerped).sub(j3.current.translation()).normalize();
+      curve.points[0]
+        .copy(j3.current.translation())
+        .addScaledVector(bandEnd, lanyardWidth * 0.015);
       curve.points[1].copy(j2.current.lerped);
       curve.points[2].copy(j1.current.lerped);
       curve.points[3].copy(fixed.current.translation());
-      band.current.geometry.setPoints(curve.getPoints(isMobile ? 16 : 32));
+      band.current?.geometry.setPoints(curve.getPoints(isMobile ? 16 : 32));
       ang.copy(card.current.angvel());
       rot.copy(card.current.rotation());
       card.current.setAngvel({ x: ang.x, y: ang.y - rot.y * 0.25, z: ang.z });
@@ -405,23 +595,32 @@ function Band({
     <>
       <group position={[0, 4, 0]}>
         <RigidBody ref={fixed} {...segmentProps} type="fixed" />
-        <RigidBody position={[0.5, 0, 0]} ref={j1} {...segmentProps}>
-          <BallCollider args={[0.1]} />
-        </RigidBody>
-        <RigidBody position={[1, 0, 0]} ref={j2} {...segmentProps}>
-          <BallCollider args={[0.1]} />
-        </RigidBody>
-        <RigidBody position={[1.5, 0, 0]} ref={j3} {...segmentProps}>
-          <BallCollider args={[0.1]} />
-        </RigidBody>
-        <RigidBody position={[2, 0, 0]} ref={card} {...segmentProps} type={dragged ? 'kinematicPosition' : 'dynamic'}>
-          <CuboidCollider args={[0.8, 1.125, 0.01]} />
+        {showLanyard && (
+          <>
+            <RigidBody position={[ropeSegmentLength * 0.5, 0, 0]} ref={j1} {...segmentProps}>
+              <BallCollider args={[0.1]} />
+            </RigidBody>
+            <RigidBody position={[ropeSegmentLength, 0, 0]} ref={j2} {...segmentProps}>
+              <BallCollider args={[0.1]} />
+            </RigidBody>
+            <RigidBody position={[ropeSegmentLength * 1.5, 0, 0]} ref={j3} {...segmentProps}>
+              <BallCollider args={[0.1]} />
+            </RigidBody>
+          </>
+        )}
+        <RigidBody
+          position={showLanyard ? [ropeSegmentLength * 2, 0, 0] : [0, -cardAttachmentY, 0]}
+          ref={card}
+          {...segmentProps}
+          type={dragged ? 'kinematicPosition' : 'dynamic'}
+        >
+          <CuboidCollider args={[0.8 * cardScaleRatio, 1.125 * cardScaleRatio, 0.01]} />
           <group
-            scale={2.25}
+            scale={cardScale}
             position={[0, -1.2, -0.05]}
-            onPointerOver={() => hover(true)}
-            onPointerOut={() => hover(false)}
-            onPointerUp={(e: any) => {
+            onPointerOver={interactive ? () => hover(true) : undefined}
+            onPointerOut={interactive ? () => hover(false) : undefined}
+            onPointerUp={interactive ? (e: any) => {
               try {
                 e.target.releasePointerCapture(e.pointerId);
               } catch {
@@ -442,8 +641,8 @@ function Band({
                 document.body.style.userSelect = '';
                 window.getSelection?.()?.removeAllRanges?.();
               }
-            }}
-            onPointerDown={(e: any) => {
+            } : undefined}
+            onPointerDown={interactive ? (e: any) => {
               try {
                 e.target.setPointerCapture(e.pointerId);
               } catch {
@@ -456,7 +655,7 @@ function Band({
               interaction?.setDragging(true);
               pullStart.current = { x: e.clientX, y: e.clientY };
               drag(new THREE.Vector3().copy(e.point).sub(vec.copy(card.current.translation())));
-            }}
+            } : undefined}
           >
             <mesh geometry={nodes.card.geometry}>
               <meshPhysicalMaterial
@@ -472,19 +671,34 @@ function Band({
             <mesh geometry={nodes.clamp.geometry} material={materials.metal} />
           </group>
         </RigidBody>
+        {showLanyard ? (
+          <RopeJoints
+            fixed={fixed}
+            j1={j1}
+            j2={j2}
+            j3={j3}
+            card={card}
+            segmentLength={ropeSegmentLength}
+            cardAttachmentY={cardAttachmentY}
+          />
+        ) : (
+          <RingJoint fixed={fixed} card={card} cardAttachmentY={cardAttachmentY} />
+        )}
       </group>
-      <mesh ref={band}>
-        <meshLineGeometry />
-        <meshLineMaterial
-          color="white"
-          depthTest={false}
-          resolution={isMobile ? [1000, 2000] : [1000, 1000]}
-          useMap={1}
-          map={bandMap}
-          repeat={[-4, 1]}
-          lineWidth={lanyardWidth}
-        />
-      </mesh>
+      {showLanyard && (
+        <mesh ref={band}>
+          <meshLineGeometry />
+          <meshLineMaterial
+            color="white"
+            depthTest
+            resolution={isMobile ? [1000, 2000] : [1000, 1000]}
+            useMap={1}
+            map={bandMap}
+            repeat={[-4, 1]}
+            lineWidth={lanyardWidth}
+          />
+        </mesh>
+      )}
     </>
   );
 }

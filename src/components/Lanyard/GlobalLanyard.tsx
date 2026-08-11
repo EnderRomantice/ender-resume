@@ -1,57 +1,63 @@
 'use client';
-import { useEffect, useState } from 'react';
+
+import { useEffect, useRef, useState } from 'react';
 import LanyardScene from './LanyardScene';
 import styles from './GlobalLanyard.module.css';
 
-// A global lanyard that hangs from the top nav across the whole page.
-// The canvas spans a large area (so the badge stays visible while dragged) but
-// lets clicks pass through — only the badge itself is interactive.
 export default function GlobalLanyard() {
-  const [hasEnteredExperience, setHasEnteredExperience] = useState(false);
-  const [isInExperience, setIsInExperience] = useState(false);
+  const hangerRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    let rafId = 0;
+    if (isVisible) return;
 
-    const updateVisibility = () => {
-      const experience = document.getElementById('experience');
-      if (!experience) return;
+    const hanger = hangerRef.current;
+    const article = hanger?.parentElement;
+    if (!article) return;
 
-      const rect = experience.getBoundingClientRect();
-      const viewportHeight = window.innerHeight;
-      const shouldShow = rect.top <= viewportHeight * 0.9 && rect.bottom >= viewportHeight * 0.36;
+    let scrollContainer: Element | null = article.parentElement;
+    while (scrollContainer) {
+      const style = window.getComputedStyle(scrollContainer);
+      if (/auto|scroll/.test(style.overflowY) && scrollContainer.scrollHeight > scrollContainer.clientHeight) break;
+      scrollContainer = scrollContainer.parentElement;
+    }
+    let previousTop = scrollContainer?.scrollTop ?? window.scrollY;
 
-      if (shouldShow) setHasEnteredExperience(true);
-      setIsInExperience(shouldShow);
+    const revealIfReached = () => {
+      const rect = article.getBoundingClientRect();
+      if (rect.top < window.innerHeight * 0.82 && rect.bottom > 0) setIsVisible(true);
     };
 
-    const scheduleUpdate = () => {
-      window.cancelAnimationFrame(rafId);
-      rafId = window.requestAnimationFrame(updateVisibility);
+    const handleWheel = (event: WheelEvent) => {
+      if (event.deltaY > 2) revealIfReached();
     };
 
-    updateVisibility();
-    document.addEventListener('scroll', scheduleUpdate, { capture: true, passive: true });
-    window.addEventListener('resize', scheduleUpdate);
+    const handleScroll = () => {
+      const currentTop = scrollContainer?.scrollTop ?? window.scrollY;
+      if (currentTop > previousTop + 1) revealIfReached();
+      previousTop = currentTop;
+    };
 
+    window.addEventListener('wheel', handleWheel, { passive: true });
+    document.addEventListener('scroll', handleScroll, { capture: true, passive: true });
     return () => {
-      window.cancelAnimationFrame(rafId);
-      document.removeEventListener('scroll', scheduleUpdate, { capture: true });
-      window.removeEventListener('resize', scheduleUpdate);
+      window.removeEventListener('wheel', handleWheel);
+      document.removeEventListener('scroll', handleScroll, { capture: true });
     };
-  }, []);
-
-  if (!hasEnteredExperience) return null;
+  }, [isVisible]);
 
   return (
-    <div className={`${styles.overlay} ${isInExperience ? styles.overlayVisible : styles.overlayHidden}`} aria-hidden>
+    <div ref={hangerRef} className={styles.hanger} data-open={isVisible} aria-hidden>
       <LanyardScene
         position={[0, 0, 30]}
         gravity={[0, -40, 0]}
         frontImage="/card-front.png"
         backImage="/logos/scp-card-back.png"
-        lanyardImage="/logos/scp-card-back.png"
-        lanyardWidth={1}
+        cardScale={2.9}
+        ropeSegmentLength={0.001}
+        showLanyard={false}
+        interactive={false}
+        swayOnScroll
         passThrough
       />
     </div>
