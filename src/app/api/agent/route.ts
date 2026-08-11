@@ -1,4 +1,10 @@
-import { answerFromKnowledge, getKnowledgeContext, isSecondExperienceQuestion } from "@/lib/agent/knowledge";
+import {
+  answerFromKnowledge,
+  answerXTraceFromKnowledge,
+  getKnowledgeContext,
+  isSecondExperienceQuestion,
+  isXTraceQuestion,
+} from "@/lib/agent/knowledge";
 
 type DeepSeekResponse = {
   choices?: Array<{ message?: { content?: string | null } }>;
@@ -19,9 +25,11 @@ export async function POST(request: Request) {
 
   const apiKey = process.env.DEEPSEEK_API_KEY;
   if (!apiKey) {
-    const fallback = isSecondExperienceQuestion(message)
-      ? await answerFromKnowledge(message)
-      : { answer: "我忘记了，也许过段时间会回想起来。", sources: [] };
+    const fallback = isXTraceQuestion(message)
+      ? await answerXTraceFromKnowledge(message)
+      : isSecondExperienceQuestion(message)
+        ? await answerFromKnowledge(message)
+        : { answer: "我忘记了，也许过段时间会回想起来。", sources: [] };
     return Response.json({ answer: fallback.answer });
   }
 

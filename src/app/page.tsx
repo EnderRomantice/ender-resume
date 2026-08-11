@@ -9,22 +9,6 @@ const GITHUB = "https://github.com/EnderRomantice";
 
 const EXPERIENCE = [
   {
-    company: "GoldMiner",
-    domain: "Vertical AI agent for cross-border e-commerce",
-    role: "Full-Stack / Agent Developer Intern",
-    dates: "Jun 2026 — Jul 2026",
-    location: "Fujian, China",
-    badge: "Recent",
-    logo: "/logos/goldminer-logo.webp",
-    logoDark: true,
-    bullets: [
-      "Built a vertical AI agent for cross-border e-commerce, spanning frontend product screens, backend business services, and agent workflow orchestration.",
-      "Designed and implemented frontend pages around e-commerce operations such as product research, market analysis, task setup, and result review.",
-      "Developed backend APIs, data flows, and task-state handling to connect user-facing workflows with agent execution logic.",
-      "Orchestrated agent flows that turn user goals into context collection, planning, tool execution, and structured result generation.",
-    ],
-  },
-  {
     company: "Creatorone",
     domain: "AI-native TikTok Shop platform",
     role: "Full-Stack Developer",
@@ -42,17 +26,18 @@ const EXPERIENCE = [
   },
   {
     company: "XTrace",
-    domain: "AI memory",
-    role: "Frontend Developer",
+    domain: "Silicon Valley AI memory startup",
+    role: "Frontend Developer Intern",
     dates: "Dec 2025 — Feb 2026",
     location: "North America · Remote",
     badge: null,
     logo: "/logos/xtrace.png",
     logoDark: true,
     bullets: [
-      "Worked closely with UI designers to implement the project's overall web interface, translating visual direction into polished, responsive product screens.",
-      "Built chatbot experiences for the product, covering conversational UI flows, interaction states, and frontend integration details.",
-      "Developed browser extension features that extended the product experience beyond the core web client.",
+      "Designed and implemented user interfaces for a focused AI memory product, improving usability, interaction clarity, and the overall web experience.",
+      "Built the web Memory Hub and browser-extension experiences that let users manage and reuse memory across AI agents.",
+      "Supported cross-agent memory sharing through XTrace's MCP service for CLI agents and its browser extension for web-based AI tools.",
+      "Occasionally coordinated and contributed to agent-related features alongside the core frontend work.",
     ],
   },
 ];
@@ -175,9 +160,9 @@ export default function Home() {
             <h2 className={styles.sectionTitle}>Experience</h2>
           </div>
 
-          {EXPERIENCE.map((job) => (
-            <article key={job.company} className={`${styles.role} ${job.company === "GoldMiner" ? styles.lanyardRole : ""}`}>
-              {job.company === "GoldMiner" && <GlobalLanyard />}
+          {EXPERIENCE.map((job, index) => (
+            <article key={job.company} className={`${styles.role} ${index === 0 ? styles.lanyardRole : ""}`}>
+              {index === 0 && <GlobalLanyard />}
               <aside className={styles.roleAside}>
                 <div className={`${styles.logoBox} ${job.logoDark ? styles.logoBoxDark : ""}`}>
                   <Image src={job.logo} alt={`${job.company} logo`} width={30} height={30} />

@@ -11,6 +11,7 @@ export type AgentSource = {
 
 const KNOWLEDGE_PATH = path.join(process.cwd(), "knowledge");
 const SOURCE_PATH = path.join(KNOWLEDGE_PATH, "work-experience-02.md");
+const XTRACE_SOURCE_PATH = path.join(KNOWLEDGE_PATH, "work-experience-03.md");
 
 export async function getKnowledgeContext() {
   const files = (await readdir(KNOWLEDGE_PATH))
@@ -46,9 +47,16 @@ export function isSecondExperienceQuestion(question: string) {
   return TOPICS.some((topic) => normalized.includes(topic));
 }
 
+export function isXTraceQuestion(question: string) {
+  const normalized = question.toLowerCase();
+  return ["xtrace", "xtace", "ai memory", "memory hub", "浏览器插件", "browser extension", "mcp"].some(
+    (topic) => normalized.includes(topic),
+  );
+}
+
 export function isKnownQuestion(question: string) {
   const normalized = question.toLowerCase();
-  return isSecondExperienceQuestion(normalized) || PERSONAL_TOPICS.some((topic) => normalized.includes(topic));
+  return isSecondExperienceQuestion(normalized) || isXTraceQuestion(normalized) || PERSONAL_TOPICS.some((topic) => normalized.includes(topic));
 }
 
 function section(markdown: string, heading: string) {
@@ -92,6 +100,34 @@ export async function answerFromKnowledge(question: string) {
   const sources: AgentSource[] = selected.map(({ heading, body }) => ({
     id: `work-experience-02-${heading}`,
     title: `第二段工作经历 · ${heading}`,
+    excerpt: body.slice(0, 118) + (body.length > 118 ? "…" : ""),
+  }));
+
+  return { answer, sources };
+}
+
+export async function answerXTraceFromKnowledge(question: string) {
+  const markdown = await readFile(XTRACE_SOURCE_PATH, "utf8");
+  const normalized = question.toLowerCase();
+  let headings = ["公司与产品", "我的角色", "产品形态", "我的工作"];
+  let lead = "我在 XTrace 担任前端开发实习生，它是一家专注 AI Memory 的硅谷 AI Startup。";
+
+  if (/介绍|概括|讲讲|简短|一分钟|1分钟/.test(normalized)) {
+    headings = ["简短介绍"];
+    lead = "简单说：";
+  } else if (/做了什么|负责|工作|职责|前端|ux|界面/.test(normalized)) {
+    headings = ["我的角色", "我的工作"];
+    lead = "我在 XTrace 的核心工作是前端界面设计、实现和 UX 优化。";
+  } else if (/mcp|插件|memory hub|共享|产品|怎么/.test(normalized)) {
+    headings = ["公司与产品", "产品形态"];
+    lead = "XTrace 通过不同入口，让 Memory 能在多个 AI Agent 之间共享。";
+  }
+
+  const selected = headings.map((heading) => ({ heading, body: compact(section(markdown, heading)) }));
+  const answer = `${lead}\n\n${selected.map(({ body }) => body).join("\n\n")}`;
+  const sources: AgentSource[] = selected.map(({ heading, body }) => ({
+    id: `work-experience-03-${heading}`,
+    title: `XTrace 工作经历 · ${heading}`,
     excerpt: body.slice(0, 118) + (body.length > 118 ? "…" : ""),
   }));
 
