@@ -21,7 +21,7 @@ const EXPERIENCE = [
       "Built an AI-native TikTok Shop platform from 0 to 1, covering frontend architecture, backend APIs, authentication, authorization, database schema design, and AI agent workflows.",
       "Developed multi-page business dashboard flows with internationalization, analytics tracking, state management, reusable business components, and polished interaction details.",
       "Designed backend routing, auth flows, access-control logic, API contracts, and relational data models for secure multi-user business operations.",
-      "Orchestrated AI agent loops with system prompts, Mem0 memory integration, and task execution logic for TikTok Shop seller and creator automation scenarios.",
+      "Orchestrated AI agent workflows with system prompts, memory, tool calling, and task execution for TikTok Shop seller and creator automation scenarios.",
     ],
   },
   {
@@ -37,7 +37,7 @@ const EXPERIENCE = [
       "Designed and implemented user interfaces for a focused AI memory product, improving usability, interaction clarity, and the overall web experience.",
       "Built the web Memory Hub and browser-extension experiences that let users manage and reuse memory across AI agents.",
       "Supported cross-agent memory sharing through XTrace's MCP service for CLI agents and its browser extension for web-based AI tools.",
-      "Occasionally coordinated and contributed to agent-related features alongside the core frontend work.",
+      "Contributed across the complete product flow, including web UX, Memory Hub, browser extension, MCP integration, and agent-feature coordination.",
     ],
   },
 ];

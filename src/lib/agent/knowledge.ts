@@ -75,12 +75,12 @@ function compact(value: string) {
 export async function answerFromKnowledge(question: string) {
   const markdown = await readFile(SOURCE_PATH, "utf8");
   const normalized = question.toLowerCase();
-  let headings = ["项目概述", "三个核心亮点"];
+  let headings = ["项目概述", "我的工作", "三个核心亮点"];
   let lead = "我的第二段工作经历是在 Creatorone 参与一款面向 TikTok Shop 商家的 AI 达人营销 SaaS。";
 
   if (/一分钟|1分钟|介绍|概括|讲讲/.test(normalized)) {
-    headings = ["面试时的 1 分钟版本"];
-    lead = "如果用面试中的 1 分钟来介绍，我会这样说：";
+    headings = ["面试时的 1 分钟版本", "我的工作"];
+    lead = "我会先介绍 Creatorone 做什么，再讲我参与的部分：";
   } else if (/难点|挑战|困难|可靠/.test(normalized)) {
     headings = ["项目难点"];
     lead = "这个项目最难的不是接入模型，而是控制 Agent 的边界与执行可靠性。";
@@ -91,8 +91,8 @@ export async function answerFromKnowledge(question: string) {
     headings = ["技术架构", "三个核心亮点"];
     lead = "架构的关键原则是：Agent 负责推理和动作选择，业务服务负责真实数据与确定性规则。";
   } else if (/链路|触达|流程|bullmq|队列/.test(normalized)) {
-    headings = ["核心业务链路：自动触达达人"];
-    lead = "最能体现系统设计的一条链路，是自动触达达人：";
+    headings = ["核心业务链路：达人营销自动化"];
+    lead = "最能体现系统设计的一条链路，是达人营销自动化：";
   }
 
   const selected = headings.map((heading) => ({ heading, body: compact(section(markdown, heading)) }));
@@ -110,14 +110,14 @@ export async function answerXTraceFromKnowledge(question: string) {
   const markdown = await readFile(XTRACE_SOURCE_PATH, "utf8");
   const normalized = question.toLowerCase();
   let headings = ["公司与产品", "我的角色", "产品形态", "我的工作"];
-  let lead = "我在 XTrace 担任前端开发实习生，它是一家专注 AI Memory 的硅谷 AI Startup。";
+  let lead = "我在 XTrace 担任前端开发实习生，参与了公司整套跨 Agent Memory 产品的建设。";
 
   if (/介绍|概括|讲讲|简短|一分钟|1分钟/.test(normalized)) {
     headings = ["简短介绍"];
     lead = "简单说：";
   } else if (/做了什么|负责|工作|职责|前端|ux|界面/.test(normalized)) {
-    headings = ["我的角色", "我的工作"];
-    lead = "我在 XTrace 的核心工作是前端界面设计、实现和 UX 优化。";
+    headings = ["公司与产品", "产品形态", "我的工作"];
+    lead = "我参与的是 XTrace 想做的整套事情，不只是单独的 Web 页面。";
   } else if (/mcp|插件|memory hub|共享|产品|怎么/.test(normalized)) {
     headings = ["公司与产品", "产品形态"];
     lead = "XTrace 通过不同入口，让 Memory 能在多个 AI Agent 之间共享。";

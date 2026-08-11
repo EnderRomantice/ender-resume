@@ -5,6 +5,13 @@ import ChengduMap from "@/components/ChengduMap/ChengduMap";
 import styles from "./PortfolioAgent.module.css";
 
 type Phase = "map" | "dissolving" | "restoring" | "ready" | "thinking" | "answer";
+type ConversationMessage = {
+  role: "user" | "assistant";
+  content: string;
+};
+
+const CONTEXT_STORAGE_KEY = "ender-agent-context";
+const MAX_CONTEXT_MESSAGES = 30;
 
 const PIXEL_DELAYS = Array.from({ length: 9 }, (_, index) => {
   const row = Math.floor(index / 3);
@@ -58,6 +65,28 @@ export default function PortfolioAgent() {
   const transitionTimersRef = useRef<number[]>([]);
   const requestVersionRef = useRef(0);
   const restoreAllowedAtRef = useRef(0);
+  const conversationRef = useRef<ConversationMessage[]>([]);
+
+  useEffect(() => {
+    try {
+      const cached = window.sessionStorage.getItem(CONTEXT_STORAGE_KEY);
+      if (!cached) return;
+      const parsed = JSON.parse(cached) as unknown;
+      if (!Array.isArray(parsed)) return;
+      conversationRef.current = parsed
+        .filter(
+          (item): item is ConversationMessage =>
+            typeof item === "object" &&
+            item !== null &&
+            (item as ConversationMessage).role !== undefined &&
+            ["user", "assistant"].includes((item as ConversationMessage).role) &&
+            typeof (item as ConversationMessage).content === "string",
+        )
+        .slice(-MAX_CONTEXT_MESSAGES);
+    } catch {
+      window.sessionStorage.removeItem(CONTEXT_STORAGE_KEY);
+    }
+  }, []);
 
   useEffect(() => {
     if (phase !== "ready") return;
@@ -134,19 +163,29 @@ export default function PortfolioAgent() {
     setHasAsked(true);
     setPhase("thinking");
     setQuestion("");
+    const context = conversationRef.current.slice(-(MAX_CONTEXT_MESSAGES - 1));
 
     try {
       const [response] = await Promise.all([
         fetch("/api/agent", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: value }),
+          body: JSON.stringify({ message: value, context }),
         }),
         new Promise((resolve) => window.setTimeout(resolve, 750)),
       ]);
       const data = (await response.json()) as { answer?: string; error?: string };
       if (requestVersion !== requestVersionRef.current) return;
       if (!response.ok || !data.answer) throw new Error(data.error ?? "暂时无法回答");
+      const newMessages: ConversationMessage[] = [
+        { role: "user", content: value },
+        { role: "assistant", content: data.answer },
+      ];
+      conversationRef.current = [
+        ...context,
+        ...newMessages,
+      ].slice(-MAX_CONTEXT_MESSAGES);
+      window.sessionStorage.setItem(CONTEXT_STORAGE_KEY, JSON.stringify(conversationRef.current));
       setAnswer(data.answer);
       setPhase("answer");
     } catch (requestError) {

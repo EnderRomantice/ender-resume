@@ -12,7 +12,7 @@ XTrace 是一家位于硅谷、专注 AI Memory 垂直方向的 AI Startup。产
 
 # 我的角色
 
-我在 XTrace 担任前端开发实习生，主要负责用户界面的设计、实现与体验优化。工作重点包括信息架构、交互状态、组件一致性和具体页面细节，也会根据需要协调并参与少量 Agent 相关功能的实现与联调。
+我在 XTrace 担任前端开发实习生，参与了公司整套 AI Memory 产品的建设，包括 Web 用户界面与 UX、Memory Hub、浏览器插件、MCP 服务接入，以及 Agent 相关功能的实现与联调。岗位方向以前端为主，但介绍工作内容时，应完整讲清楚我参与的产品整体，而不是把经历缩减成只做页面、偶尔接触 Agent。
 
 # 产品形态
 
@@ -25,8 +25,9 @@ XTrace 是一家位于硅谷、专注 AI Memory 垂直方向的 AI Startup。产
 - 设计并实现产品 Web 用户界面，持续优化 UX、响应式表现和交互清晰度。
 - 参与 Web Memory Hub 的前端开发，支持用户集中管理、查看和复用 Memory。
 - 参与浏览器插件功能开发，把 XTrace 的 Memory 能力接入用户真实使用的 Web AI Agent 工作流。
-- 配合 MCP 服务与 Agent 相关能力的产品联调，确保跨端 Memory 共享流程在界面上清晰、可用。
+- 参与 MCP 服务接入与 Agent 相关能力的实现和联调，支持 CLI Agent 共享 Memory。
+- 围绕公司要实现的跨 Agent Memory 共享目标，参与从 CLI、浏览器插件到 Web Memory Hub 的完整产品链路。
 
 # 简短介绍
 
-我在 XTrace 做前端开发实习。它是一家硅谷 AI Startup，专注在不同 AI Agent 之间共享 Memory：CLI Agent 通过 MCP 服务接入，网页端通过浏览器插件使用，用户再通过 Web Memory Hub 统一管理。我主要负责界面设计与 UX 优化，也偶尔协调和参与 Agent 相关功能。
+我在 XTrace 做前端开发实习，参与了整套跨 Agent Memory 产品的建设。它是一家硅谷 AI Startup：CLI Agent 通过 MCP 服务共享 Memory，网页端通过浏览器插件使用，用户再通过 Web Memory Hub 统一管理。我参与了 Web 界面与 UX、Memory Hub、浏览器插件、MCP 接入和 Agent 功能联调。
