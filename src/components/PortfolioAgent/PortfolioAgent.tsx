@@ -1,6 +1,9 @@
 "use client";
 
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { layout, prepare } from "@chenglou/pretext";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import ChengduMap from "@/components/ChengduMap/ChengduMap";
 import styles from "./PortfolioAgent.module.css";
 
@@ -54,6 +57,72 @@ function LoadingState() {
   );
 }
 
+const FONT_LEVELS = [20, 18, 16, 14, 12, 10, 9, 8, 7, 6, 5, 4];
+
+function plainText(markdown: string) {
+  return markdown.replace(/```[\s\S]*?```/g, (value) => value.slice(3, -3)).replace(/[`*_>#\[\]()-]/g, " ");
+}
+
+function AdaptiveAnswer({ content }: { content: string }) {
+  const hostRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    const host = hostRef.current;
+    const boundary = host?.parentElement;
+    if (!host || !boundary) return;
+
+    let frame = 0;
+    const fit = () => {
+      const width = host.clientWidth;
+      const available = boundary.clientHeight;
+      let nextLevel = 0;
+      if (width > 0 && available > 0) {
+        for (let index = 0; index < FONT_LEVELS.length; index += 1) {
+          const size = FONT_LEVELS[index];
+          const estimate = layout(prepare(plainText(content), `${size}px Georgia`, { whiteSpace: "pre-wrap" }), width, size * 1.6).height;
+          nextLevel = index;
+          if (estimate <= available) break;
+        }
+      }
+      // Apply each candidate synchronously: the first painted frame already uses
+      // the final level, so long answers never flash at the largest size.
+      host.dataset.measuring = "true";
+      let resolved = nextLevel;
+      while (resolved < FONT_LEVELS.length) {
+        host.style.setProperty("--answer-size", `${FONT_LEVELS[resolved]}px`);
+        if (host.scrollHeight <= available + 1 || resolved === FONT_LEVELS.length - 1) break;
+        resolved += 1;
+      }
+      // Extremely long output keeps shrinking instead of introducing a nested
+      // scrollbar. This is intentionally uncapped by a "readable minimum": the
+      // interaction contract is that the complete answer is always visible.
+      let exactSize = FONT_LEVELS[resolved];
+      while (host.scrollHeight > available + 1 && exactSize > 1) {
+        exactSize = Math.max(1, exactSize - 0.5);
+        host.style.setProperty("--answer-size", `${exactSize}px`);
+      }
+      host.dataset.fontLevel = String(resolved);
+      host.dataset.fontSize = String(exactSize);
+      frame = requestAnimationFrame(() => delete host.dataset.measuring);
+    };
+
+    const observer = new ResizeObserver(fit);
+    observer.observe(boundary);
+    document.fonts.ready.then(fit);
+    fit();
+    return () => {
+      observer.disconnect();
+      cancelAnimationFrame(frame);
+    };
+  }, [content]);
+
+  return (
+    <div ref={hostRef} className={styles.markdown} style={{ "--answer-size": `${FONT_LEVELS[0]}px` } as React.CSSProperties}>
+      <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+    </div>
+  );
+}
+
 export default function PortfolioAgent() {
   const [phase, setPhase] = useState<Phase>("map");
   const [question, setQuestion] = useState("");
@@ -100,9 +169,6 @@ export default function PortfolioAgent() {
   useEffect(() => {
     if (phase === "map" || phase === "dissolving" || phase === "restoring") return;
 
-    const scrollPositions = new WeakMap<Element, number>();
-    let windowScrollPosition = window.scrollY;
-
     const restoreMap = () => {
       if (Date.now() < restoreAllowedAtRef.current) return;
       requestVersionRef.current += 1;
@@ -116,29 +182,14 @@ export default function PortfolioAgent() {
     };
 
     const handleWheel = (event: WheelEvent) => {
-      if (event.deltaY > 2) restoreMap();
-    };
-
-    const handleScroll = (event: Event) => {
-      if (event.target instanceof Element) {
-        const current = event.target.scrollTop;
-        const previous = scrollPositions.get(event.target) ?? 0;
-        scrollPositions.set(event.target, current);
-        if (current > previous + 1) restoreMap();
-        return;
-      }
-
-      const current = window.scrollY;
-      if (current > windowScrollPosition + 1) restoreMap();
-      windowScrollPosition = current;
+      if (event.deltaY <= 2) return;
+      const target = event.target instanceof Element ? event.target : null;
+      if (target?.closest(`.${styles.stage}`)) return;
+      restoreMap();
     };
 
     window.addEventListener("wheel", handleWheel, { passive: true });
-    document.addEventListener("scroll", handleScroll, { capture: true, passive: true });
-    return () => {
-      window.removeEventListener("wheel", handleWheel);
-      document.removeEventListener("scroll", handleScroll, { capture: true });
-    };
+    return () => window.removeEventListener("wheel", handleWheel);
   }, [phase]);
 
   function enterAgent() {
@@ -201,13 +252,14 @@ export default function PortfolioAgent() {
     (phase === "restoring" && transitionCovered);
 
   return (
-    <section className={`${styles.stage} ${styles[phase]}`} aria-label="Ask Ender">
+    <section className={`${styles.stage} ${styles[phase] ?? ""}`} aria-label="Ask Ender">
       {mapVisible && (
         <div
           className={styles.mapEntry}
           role="button"
           tabIndex={0}
           onMouseEnter={enterAgent}
+          onClick={enterAgent}
           onFocus={enterAgent}
           onTouchStart={enterAgent}
           aria-label="Ask Ender anything"
@@ -233,7 +285,7 @@ export default function PortfolioAgent() {
             <div className={styles.responseArea} aria-live="polite">
               {answer && (
                 <div className={`${styles.answer} ${phase === "thinking" ? styles.answerExit : styles.answerEnter}`}>
-                  <p>{answer}</p>
+                  <AdaptiveAnswer content={answer} />
                 </div>
               )}
             </div>

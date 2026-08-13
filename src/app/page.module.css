@@ -155,6 +155,10 @@
   isolation: isolate;
 }
 
+.openSourceSection {
+  padding-bottom: 0;
+}
+
 .sectionHead {
   display: flex;
   align-items: baseline;

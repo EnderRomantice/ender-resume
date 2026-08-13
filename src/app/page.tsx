@@ -2,6 +2,7 @@ import Image from "next/image";
 import PageParticleScroll from "@/components/PageParticleScroll/PageParticleScroll";
 import PortfolioAgent from "@/components/PortfolioAgent/PortfolioAgent";
 import GlobalLanyard from "@/components/Lanyard/GlobalLanyard";
+import OpenSourceStack from "@/components/OpenSourceStack/OpenSourceStack";
 import styles from "./page.module.css";
 
 const EMAIL = "enderromantic@gmail.com";
@@ -51,6 +52,13 @@ const OPEN_SOURCE = [
     preview: "https://reactbits.dev/",
     previewImage: "/previews/react-bits.png",
     stars: "42.4k",
+    contributions: [
+      "Maintained and refined the existing component library.",
+      "Expanded component APIs and improved prop design for greater flexibility.",
+      "Reproduced, diagnosed, and resolved component and interaction bugs.",
+      "Strengthened the project architecture and developer workflow.",
+      "Designed and shipped original components from concept to release.",
+    ],
   },
   {
     name: "vue-grab",
@@ -60,6 +68,11 @@ const OPEN_SOURCE = [
     preview: "https://vue-grab.vercel.app/",
     previewImage: "/previews/vue-grab.png",
     stars: "88",
+    contributions: [
+      "Built and maintained the project independently from zero to one.",
+      "Owned the complete architecture, from the core agent system through the framework adaptation layer.",
+      "Led ongoing API design, documentation, releases, and project direction.",
+    ],
   },
   {
     name: "skill-npm",
@@ -69,6 +82,11 @@ const OPEN_SOURCE = [
     preview: "https://www.jsdelivr.com/package/npm/skills-npm",
     previewImage: "/previews/skills-npm.png",
     stars: "479",
+    contributions: [
+      "Improved the early-stage codebase and helped shape its foundational architecture.",
+      "Introduced new capabilities and streamlined key developer workflows.",
+      "Contributed during the project’s formative stage; no longer actively involved in maintenance.",
+    ],
   },
 ];
 
@@ -100,12 +118,6 @@ const GmailIcon = (
 const GitHubIcon = (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
     <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 6.844c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222 0 1.606-.014 2.898-.014 3.293 0 .322.216.694.825.576C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
-  </svg>
-);
-
-const StarIcon = (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-    <path d="m12 2.25 2.91 5.9 6.51.95-4.71 4.59 1.11 6.48L12 17.11l-5.82 3.06 1.11-6.48L2.58 9.1l6.51-.95L12 2.25z" />
   </svg>
 );
 
@@ -188,52 +200,12 @@ export default function Home() {
         </section>
 
         {/* Open source */}
-        <section id="open-source" className={styles.section}>
+        <section id="open-source" className={`${styles.section} ${styles.openSourceSection}`}>
           <div className={styles.sectionHead}>
             <h2 className={styles.sectionTitle}>Open Source</h2>
           </div>
 
-          <div className={styles.osGrid}>
-            {OPEN_SOURCE.map((p) => (
-              <article key={p.name} className={styles.osCard}>
-                <a
-                  className={styles.osPreview}
-                  href={p.preview}
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label={`Open ${p.name} website`}
-                >
-                  <Image
-                    src={p.previewImage}
-                    alt={`${p.name} website preview`}
-                    fill
-                    sizes="(max-width: 860px) 86vw, 760px"
-                  />
-                </a>
-                <div className={styles.osContent}>
-                  <div className={styles.osTop}>
-                    <span className={styles.osRank}>{p.rank}</span>
-                    <a
-                      className={styles.osGitHub}
-                      href={p.href}
-                      target="_blank"
-                      rel="noreferrer"
-                      aria-label={`Open ${p.name} on GitHub`}
-                      title={`Open ${p.name} on GitHub`}
-                    >
-                      {GitHubIcon}
-                    </a>
-                  </div>
-                  <span className={styles.osName}>{p.name}</span>
-                  <span className={styles.osDesc}>{p.desc}</span>
-                  <span className={styles.osMeta} aria-label={`${p.name} GitHub stars`}>
-                    {StarIcon}
-                    {p.stars}
-                  </span>
-                </div>
-              </article>
-            ))}
-          </div>
+          <OpenSourceStack projects={OPEN_SOURCE} />
         </section>
 
         {/* Skills */}

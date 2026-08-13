@@ -1,0 +1,4 @@
+.swap { position:absolute; left:0; bottom:20px; perspective:900px; overflow:visible; }
+.card { position:absolute; top:50%; left:50%; border-radius:16px; transform:translate(-50%,-50%); transform-style:preserve-3d; will-change:transform; backface-visibility:hidden; }
+@media (prefers-reduced-motion:reduce) { .card { will-change:auto; } }
+@media (max-width:860px) { .swap { width:calc(100% - 48px) !important; height:580px !important; }.card { width:100% !important; height:580px !important; } }
