@@ -21,7 +21,7 @@ const StarIcon = <svg width="16" height="16" viewBox="0 0 24 24" fill="currentCo
 export default function OpenSourceStack({ projects }: { projects: OpenSourceProject[] }) {
   return (
     <div className={styles.stack}>
-      <CardSwap width="calc(100% - 120px)" height={440} cardDistance={60} verticalDistance={60} delay={5000} skewAmount={2} easing="elastic">
+      <CardSwap width="calc(100% - 60px)" height={440} cardDistance={30} verticalDistance={60} delay={5000} skewAmount={2} easing="elastic">
         {projects.map((project, index) => (
           <Card key={project.name} customClass={styles.card} role="article">
             <div className={styles.tab}><span>{project.name}</span><span>{String(index + 1).padStart(2, "0")}</span></div>
