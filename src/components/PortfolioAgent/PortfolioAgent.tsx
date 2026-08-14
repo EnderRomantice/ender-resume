@@ -13,8 +13,28 @@ type ConversationMessage = {
   content: string;
 };
 
-const CONTEXT_STORAGE_KEY = "ender-agent-context";
 const MAX_CONTEXT_MESSAGES = 30;
+const SUGGESTION_DELAY_MS = 2000;
+const SUGGESTIONS = [
+  "What music do you love most?",
+  "Tell me about your previous work experience.",
+  "What open-source projects have you built?",
+];
+
+function shuffleSuggestions() {
+  const suggestions = [...SUGGESTIONS];
+  for (let index = suggestions.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1));
+    [suggestions[index], suggestions[swapIndex]] = [suggestions[swapIndex], suggestions[index]];
+  }
+  return suggestions;
+}
+
+function durationToMilliseconds(value: string, fallback: number) {
+  const duration = Number.parseFloat(value);
+  if (!Number.isFinite(duration)) return fallback;
+  return value.trim().endsWith("ms") ? duration : duration * 1000;
+}
 
 const PIXEL_DELAYS = Array.from({ length: 9 }, (_, index) => {
   const row = Math.floor(index / 3);
@@ -71,39 +91,55 @@ function AdaptiveAnswer({ content }: { content: string }) {
     const boundary = host?.parentElement;
     if (!host || !boundary) return;
 
-    let frame = 0;
     const fit = () => {
       const width = host.clientWidth;
       const available = boundary.clientHeight;
+      if (width <= 0 || available <= 0) return;
+
       let nextLevel = 0;
-      if (width > 0 && available > 0) {
-        for (let index = 0; index < FONT_LEVELS.length; index += 1) {
-          const size = FONT_LEVELS[index];
-          const estimate = layout(prepare(plainText(content), `${size}px Georgia`, { whiteSpace: "pre-wrap" }), width, size * 1.6).height;
-          nextLevel = index;
-          if (estimate <= available) break;
-        }
+      for (let index = 0; index < FONT_LEVELS.length; index += 1) {
+        const size = FONT_LEVELS[index];
+        const estimate = layout(prepare(plainText(content), `${size}px Georgia`, { whiteSpace: "pre-wrap" }), width, size * 1.6).height;
+        nextLevel = index;
+        if (estimate <= available) break;
       }
-      // Apply each candidate synchronously: the first painted frame already uses
-      // the final level, so long answers never flash at the largest size.
-      host.dataset.measuring = "true";
+
+      // Measure against an invisible copy so the visible answer can transition
+      // once, from its current size to the resolved size, without intermediate jumps.
+      const probe = host.cloneNode(true) as HTMLDivElement;
+      probe.removeAttribute("data-measuring");
+      Object.assign(probe.style, {
+        position: "fixed",
+        left: "-10000px",
+        top: "0",
+        width: `${width}px`,
+        height: "auto",
+        maxHeight: "none",
+        overflow: "visible",
+        visibility: "hidden",
+        transition: "none",
+      });
+      document.body.appendChild(probe);
+
       let resolved = nextLevel;
       while (resolved < FONT_LEVELS.length) {
-        host.style.setProperty("--answer-size", `${FONT_LEVELS[resolved]}px`);
-        if (host.scrollHeight <= available + 1 || resolved === FONT_LEVELS.length - 1) break;
+        probe.style.setProperty("--answer-size", `${FONT_LEVELS[resolved]}px`);
+        if (probe.scrollHeight <= available + 1 || resolved === FONT_LEVELS.length - 1) break;
         resolved += 1;
       }
       // Extremely long output keeps shrinking instead of introducing a nested
       // scrollbar. This is intentionally uncapped by a "readable minimum": the
       // interaction contract is that the complete answer is always visible.
       let exactSize = FONT_LEVELS[resolved];
-      while (host.scrollHeight > available + 1 && exactSize > 1) {
+      while (probe.scrollHeight > available + 1 && exactSize > 1) {
         exactSize = Math.max(1, exactSize - 0.5);
-        host.style.setProperty("--answer-size", `${exactSize}px`);
+        probe.style.setProperty("--answer-size", `${exactSize}px`);
       }
+      probe.remove();
+
+      host.style.setProperty("--answer-size", `${exactSize}px`);
       host.dataset.fontLevel = String(resolved);
       host.dataset.fontSize = String(exactSize);
-      frame = requestAnimationFrame(() => delete host.dataset.measuring);
     };
 
     const observer = new ResizeObserver(fit);
@@ -112,7 +148,6 @@ function AdaptiveAnswer({ content }: { content: string }) {
     fit();
     return () => {
       observer.disconnect();
-      cancelAnimationFrame(frame);
     };
   }, [content]);
 
@@ -130,39 +165,91 @@ export default function PortfolioAgent() {
   const [error, setError] = useState("");
   const [hasAsked, setHasAsked] = useState(false);
   const [transitionCovered, setTransitionCovered] = useState(false);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [suggestionsReady, setSuggestionsReady] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const formMoverRef = useRef<HTMLDivElement>(null);
+  const formTopRef = useRef<number | null>(null);
+  const formMoveAnimationRef = useRef<Animation | null>(null);
   const transitionTimersRef = useRef<number[]>([]);
   const requestVersionRef = useRef(0);
   const restoreAllowedAtRef = useRef(0);
   const conversationRef = useRef<ConversationMessage[]>([]);
 
   useEffect(() => {
-    try {
-      const cached = window.sessionStorage.getItem(CONTEXT_STORAGE_KEY);
-      if (!cached) return;
-      const parsed = JSON.parse(cached) as unknown;
-      if (!Array.isArray(parsed)) return;
-      conversationRef.current = parsed
-        .filter(
-          (item): item is ConversationMessage =>
-            typeof item === "object" &&
-            item !== null &&
-            (item as ConversationMessage).role !== undefined &&
-            ["user", "assistant"].includes((item as ConversationMessage).role) &&
-            typeof (item as ConversationMessage).content === "string",
-        )
-        .slice(-MAX_CONTEXT_MESSAGES);
-    } catch {
-      window.sessionStorage.removeItem(CONTEXT_STORAGE_KEY);
-    }
-  }, []);
-
-  useEffect(() => {
     if (phase !== "ready") return;
     inputRef.current?.focus();
   }, [phase]);
 
+  useLayoutEffect(() => {
+    const formMover = formMoverRef.current;
+    if (!formMover) return;
+    if (formMoveAnimationRef.current?.playState === "running") return;
+
+    const nextTop = formMover.getBoundingClientRect().top;
+    const previousTop = formTopRef.current;
+    formTopRef.current = nextTop;
+    if (!answer || previousTop === null) return;
+
+    const deltaY = previousTop - nextTop;
+    if (Math.abs(deltaY) < 1 || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const styles = window.getComputedStyle(formMover);
+    const duration = durationToMilliseconds(styles.getPropertyValue("--duration-very-slow"), 500);
+    const easing = styles.getPropertyValue("--ease-smooth-out").trim() || "cubic-bezier(0.22, 1, 0.36, 1)";
+    const animation = formMover.animate(
+      [
+        { transform: `translateY(${deltaY}px)` },
+        { transform: "translateY(0)" },
+      ],
+      { duration, easing },
+    );
+    formMoveAnimationRef.current = animation;
+    animation.onfinish = () => {
+      formTopRef.current = formMover.getBoundingClientRect().top;
+      if (formMoveAnimationRef.current === animation) formMoveAnimationRef.current = null;
+    };
+  }, [answer, phase]);
+
+  useEffect(() => {
+    const canSuggest = (phase === "ready" || phase === "answer") && question.length === 0;
+    if (!canSuggest) return;
+
+    const controller = new AbortController();
+    const timer = window.setTimeout(async () => {
+      const context = conversationRef.current;
+      if (context.length === 0) {
+        setSuggestions(shuffleSuggestions());
+        setSuggestionsReady(true);
+        return;
+      }
+
+      try {
+        const response = await fetch("/api/agent/suggestions", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ context }),
+          signal: controller.signal,
+        });
+        const data = (await response.json()) as { suggestions?: string[] };
+        if (!response.ok || data.suggestions?.length !== 3) return;
+        setSuggestions(data.suggestions);
+        setSuggestionsReady(true);
+      } catch (suggestionError) {
+        if (!(suggestionError instanceof DOMException && suggestionError.name === "AbortError")) {
+          console.error("Could not load suggested questions", suggestionError);
+        }
+      }
+    }, SUGGESTION_DELAY_MS);
+
+    return () => {
+      window.clearTimeout(timer);
+      controller.abort();
+    };
+  }, [phase, question]);
+
   useEffect(() => () => {
+    formMoveAnimationRef.current?.cancel();
     transitionTimersRef.current.forEach((timer) => window.clearTimeout(timer));
   }, []);
 
@@ -205,9 +292,7 @@ export default function PortfolioAgent() {
     ];
   }
 
-  async function submit(event: FormEvent) {
-    event.preventDefault();
-    const value = question.trim();
+  async function ask(value: string) {
     if (!value || phase === "thinking") return;
     const requestVersion = ++requestVersionRef.current;
     setError("");
@@ -236,7 +321,6 @@ export default function PortfolioAgent() {
         ...context,
         ...newMessages,
       ].slice(-MAX_CONTEXT_MESSAGES);
-      window.sessionStorage.setItem(CONTEXT_STORAGE_KEY, JSON.stringify(conversationRef.current));
       setAnswer(data.answer);
       setPhase("answer");
     } catch (requestError) {
@@ -244,6 +328,11 @@ export default function PortfolioAgent() {
       setError(requestError instanceof Error ? requestError.message : "连接中断，请稍后再试");
       setPhase("ready");
     }
+  }
+
+  function submit(event: FormEvent) {
+    event.preventDefault();
+    void ask(question.trim());
   }
 
   const mapVisible =
@@ -290,14 +379,37 @@ export default function PortfolioAgent() {
               )}
             </div>
             {phase === "thinking" && <LoadingState />}
+            <div ref={formMoverRef} className={styles.formMover}>
             <form className={styles.askForm} onSubmit={submit}>
               {!hasAsked && <label htmlFor="ender-question">What would you like to know?</label>}
+              <div className={styles.suggestionSpace}>
+                {suggestionsReady && question.length === 0 && (phase === "ready" || phase === "answer") && (
+                  <div className={styles.suggestions} aria-label="Suggested questions">
+                    {suggestions.map((suggestion, index) => (
+                      <button
+                        className={`${styles.suggestion} ${styles[`suggestion${index + 1}`]}`}
+                        key={suggestion}
+                        type="button"
+                        onClick={() => {
+                          setSuggestionsReady(false);
+                          void ask(suggestion);
+                        }}
+                      >
+                        {suggestion}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
               <textarea
                 id="ender-question"
                 aria-label="Ask Ender a question"
                 ref={inputRef}
                 value={question}
-                onChange={(event) => setQuestion(event.target.value)}
+                onChange={(event) => {
+                  setQuestion(event.target.value);
+                  setSuggestionsReady(false);
+                }}
                 onKeyDown={(event) => {
                   if (event.key === "Enter" && !event.shiftKey) {
                     event.preventDefault();
@@ -315,6 +427,7 @@ export default function PortfolioAgent() {
               </div>
               {error && <p className={styles.error}>{error}</p>}
             </form>
+            </div>
           </div>
         </div>
       )}
