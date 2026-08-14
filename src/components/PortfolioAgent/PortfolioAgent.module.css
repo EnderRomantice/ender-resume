@@ -39,12 +39,14 @@
 .workspace.hasResponse { height: 100%; grid-template-rows: minmax(0,1fr) auto; }
 .responseArea { display: grid; min-height: 0; overflow: hidden; }
 .workspace:not(.hasResponse) .responseArea { display: none; }
+.formMover { width: 100%; }
 .askForm { width: 100%; animation: content-in var(--duration-very-slow) var(--ease-smooth-out) 300ms both; }
 .hasResponse .askForm textarea { min-height: 46px; font-size: 18px; }
 .askForm label { display: block; font: 500 clamp(22px,2.7vw,34px)/1.12 var(--font-display), Georgia, serif; color: #171717; }
 .askForm textarea { width: 100%; min-height: 78px; resize: none; border: 0; outline: 0; background: transparent; color: #111; font: 400 clamp(18px,2vw,26px)/1.35 var(--font-display), Georgia, serif; }
 .inputRule { height: 1px; background: #bdbdb8; transform-origin: left; animation: rule-in 700ms var(--ease-smooth-out) 440ms both; }
 .suggestionSpace { min-height: 72px; display: flex; align-items: flex-start; margin-top: 14px; padding-bottom: 18px; }
+.askForm label + .suggestionSpace { height: 132px; box-sizing: border-box; }
 .suggestions { display: flex; flex-flow: row wrap; justify-content: flex-start; align-items: flex-start; column-gap: 10px; row-gap: 12px; }
 .suggestion { flex: 0 0 auto; display: block; max-width: 100%; padding: 7px 11px; border: 1px solid #deded9; border-radius: 999px; background: #fff; color: #686864; font: 12px/1.2 var(--font-display),Georgia,serif; text-align: left; cursor: pointer; opacity: 0; transform: translateY(var(--stagger-distance)); filter: blur(var(--stagger-blur)); animation: suggestion-in 850ms var(--stagger-ease) forwards; transition: border-color var(--duration-quick,150ms) ease, color var(--duration-quick,150ms) ease; will-change: transform,opacity,filter; }
 .suggestion2 { animation-delay: 90ms; }

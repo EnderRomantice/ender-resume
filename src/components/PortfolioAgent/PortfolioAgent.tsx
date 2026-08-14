@@ -13,7 +13,6 @@ type ConversationMessage = {
   content: string;
 };
 
-const CONTEXT_STORAGE_KEY = "ender-agent-context";
 const MAX_CONTEXT_MESSAGES = 30;
 const SUGGESTION_DELAY_MS = 2000;
 const SUGGESTIONS = [
@@ -29,6 +28,12 @@ function shuffleSuggestions() {
     [suggestions[index], suggestions[swapIndex]] = [suggestions[swapIndex], suggestions[index]];
   }
   return suggestions;
+}
+
+function durationToMilliseconds(value: string, fallback: number) {
+  const duration = Number.parseFloat(value);
+  if (!Number.isFinite(duration)) return fallback;
+  return value.trim().endsWith("ms") ? duration : duration * 1000;
 }
 
 const PIXEL_DELAYS = Array.from({ length: 9 }, (_, index) => {
@@ -163,36 +168,48 @@ export default function PortfolioAgent() {
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [suggestionsReady, setSuggestionsReady] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const formMoverRef = useRef<HTMLDivElement>(null);
+  const formTopRef = useRef<number | null>(null);
+  const formMoveAnimationRef = useRef<Animation | null>(null);
   const transitionTimersRef = useRef<number[]>([]);
   const requestVersionRef = useRef(0);
   const restoreAllowedAtRef = useRef(0);
   const conversationRef = useRef<ConversationMessage[]>([]);
 
   useEffect(() => {
-    try {
-      const cached = window.sessionStorage.getItem(CONTEXT_STORAGE_KEY);
-      if (!cached) return;
-      const parsed = JSON.parse(cached) as unknown;
-      if (!Array.isArray(parsed)) return;
-      conversationRef.current = parsed
-        .filter(
-          (item): item is ConversationMessage =>
-            typeof item === "object" &&
-            item !== null &&
-            (item as ConversationMessage).role !== undefined &&
-            ["user", "assistant"].includes((item as ConversationMessage).role) &&
-            typeof (item as ConversationMessage).content === "string",
-        )
-        .slice(-MAX_CONTEXT_MESSAGES);
-    } catch {
-      window.sessionStorage.removeItem(CONTEXT_STORAGE_KEY);
-    }
-  }, []);
-
-  useEffect(() => {
     if (phase !== "ready") return;
     inputRef.current?.focus();
   }, [phase]);
+
+  useLayoutEffect(() => {
+    const formMover = formMoverRef.current;
+    if (!formMover) return;
+    if (formMoveAnimationRef.current?.playState === "running") return;
+
+    const nextTop = formMover.getBoundingClientRect().top;
+    const previousTop = formTopRef.current;
+    formTopRef.current = nextTop;
+    if (!answer || previousTop === null) return;
+
+    const deltaY = previousTop - nextTop;
+    if (Math.abs(deltaY) < 1 || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const styles = window.getComputedStyle(formMover);
+    const duration = durationToMilliseconds(styles.getPropertyValue("--duration-very-slow"), 500);
+    const easing = styles.getPropertyValue("--ease-smooth-out").trim() || "cubic-bezier(0.22, 1, 0.36, 1)";
+    const animation = formMover.animate(
+      [
+        { transform: `translateY(${deltaY}px)` },
+        { transform: "translateY(0)" },
+      ],
+      { duration, easing },
+    );
+    formMoveAnimationRef.current = animation;
+    animation.onfinish = () => {
+      formTopRef.current = formMover.getBoundingClientRect().top;
+      if (formMoveAnimationRef.current === animation) formMoveAnimationRef.current = null;
+    };
+  }, [answer, phase]);
 
   useEffect(() => {
     const canSuggest = (phase === "ready" || phase === "answer") && question.length === 0;
@@ -232,6 +249,7 @@ export default function PortfolioAgent() {
   }, [phase, question]);
 
   useEffect(() => () => {
+    formMoveAnimationRef.current?.cancel();
     transitionTimersRef.current.forEach((timer) => window.clearTimeout(timer));
   }, []);
 
@@ -303,7 +321,6 @@ export default function PortfolioAgent() {
         ...context,
         ...newMessages,
       ].slice(-MAX_CONTEXT_MESSAGES);
-      window.sessionStorage.setItem(CONTEXT_STORAGE_KEY, JSON.stringify(conversationRef.current));
       setAnswer(data.answer);
       setPhase("answer");
     } catch (requestError) {
@@ -362,6 +379,7 @@ export default function PortfolioAgent() {
               )}
             </div>
             {phase === "thinking" && <LoadingState />}
+            <div ref={formMoverRef} className={styles.formMover}>
             <form className={styles.askForm} onSubmit={submit}>
               {!hasAsked && <label htmlFor="ender-question">What would you like to know?</label>}
               <div className={styles.suggestionSpace}>
@@ -409,6 +427,7 @@ export default function PortfolioAgent() {
               </div>
               {error && <p className={styles.error}>{error}</p>}
             </form>
+            </div>
           </div>
         </div>
       )}
