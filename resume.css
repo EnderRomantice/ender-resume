@@ -12,7 +12,7 @@
   --panel: #0a0a0a;
   --panel-ink: #fafafa;
   --paper-x: 15mm;
-  --paper-y: 14mm;
+  --paper-y: 12mm;
 }
 
 * {
@@ -25,8 +25,8 @@ body {
   background: var(--bg);
   color: var(--ink);
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
-  font-size: 9.4pt;
-  line-height: 1.45;
+  font-size: 9.2pt;
+  line-height: 1.42;
   letter-spacing: 0;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -34,7 +34,6 @@ body {
 
 body {
   width: 210mm;
-  min-height: 297mm;
 }
 
 a {
@@ -44,7 +43,6 @@ a {
 
 .page {
   width: 210mm;
-  min-height: 297mm;
   padding: var(--paper-y) var(--paper-x);
   background: #fff;
 }
@@ -54,7 +52,7 @@ a {
   grid-template-columns: 1fr 72mm;
   gap: 12mm;
   align-items: stretch;
-  padding-bottom: 9mm;
+  padding-bottom: 7mm;
   border-bottom: 1px solid var(--line);
 }
 
@@ -135,8 +133,8 @@ h1 {
 
 .content {
   display: grid;
-  gap: 7.2mm;
-  padding-top: 8mm;
+  gap: 5.5mm;
+  padding-top: 6mm;
 }
 
 .section {
@@ -218,7 +216,7 @@ h2 {
   display: grid;
   grid-template-columns: 29mm 1fr;
   gap: 7mm;
-  padding-top: 4.2mm;
+  padding-top: 3.4mm;
   border-top: 1px solid var(--line);
   break-inside: avoid;
 }
@@ -270,12 +268,12 @@ li:last-child {
 .portfolioGrid,
 .openSourceGrid {
   display: grid;
-  gap: 4.2mm;
+  gap: 3.4mm;
 }
 
 .portfolioCard,
 .openSourceCard {
-  padding-top: 4.2mm;
+  padding-top: 3.4mm;
   border-top: 1px solid var(--line);
   break-inside: avoid;
 }

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">42.ai</title>
+  <rect width="64" height="64" rx="12" fill="#090909"/>
+  <path fill="#fff" d="M9 36.5 25.2 13h8.4v20h5.2v7h-5.2v11H25v-11H9v-3.5Zm16-3.5V23L18.2 33H25Zm15.6-12.7c1.6-5.1 5.5-8 11.5-8 7.2 0 11.2 4.2 11.2 10.2 0 4.5-2.2 7.6-7.7 12.2L50 39.5h13.8V47H39.3v-6.1l10.5-9.5c3.9-3.5 5.3-5.4 5.3-8.1 0-2.3-1.4-3.8-3.6-3.8-2.4 0-3.8 1.4-4.7 4.2l-6.2-3.4Z"/>
+</svg>

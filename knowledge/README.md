@@ -7,5 +7,6 @@ without changing the chat UI.
 Current documents:
 
 - `about.md` — personal background, interests, style, and development setup
+- `work-experience-01.md` — 42.ai / AI-native team workflow and multi-agent infrastructure
 - `work-experience-02.md` — Creatorone / TikTok Shop AI creator-marketing platform
 - `work-experience-03.md` — XTrace / cross-agent AI memory platform
