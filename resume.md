@@ -12,6 +12,15 @@ GitHub：https://github.com/EnderRomantice ｜ 成都
 
 ## 实习 / 项目经历
 
+### 42.ai ｜ AI Native 工程师 ｜ 2026.08 - 至今
+
+聚焦视障辅助、宠物智能与阿尔茨海默照护赛道的 AI 硬件初创公司。
+
+- 从 0 到 1 构建团队的 AI Native 研发工作流，将 Agent 从个人编码助手升级为覆盖研发、协作与运营的共享基础设施。
+- 设计并实现 TypeScript Agent Runtime，支持 Tool Calling、Skills、MCP / ACP、多会话并发、持久化、取消与故障恢复，为多个业务 Agent 提供统一执行底座。
+- 开发 Electron 多 Agent 工作台，打通 Agent 创建与委派、工具审批、本地执行和团队协作；配套建设账号、组织、消息、权限及 Model Gateway 服务。
+- 交付 AI 招聘系统、公司官网与申请流程、社群活动平台等内部及用户侧产品，覆盖全栈架构、自动化、无障碍体验与部署。
+
 ### Creatorone ｜ 全栈开发 ｜ 2026.02 - 2026.06
 
 AI Native TikTok Shop 平台，面向北美市场远程协作开发。

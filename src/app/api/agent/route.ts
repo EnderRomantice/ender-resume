@@ -1,7 +1,9 @@
 import {
+  answerFortyTwoFromKnowledge,
   answerFromKnowledge,
   answerXTraceFromKnowledge,
   getKnowledgeContext,
+  isFortyTwoQuestion,
   isSecondExperienceQuestion,
   isXTraceQuestion,
 } from "@/lib/agent/knowledge";
@@ -45,7 +47,9 @@ export async function POST(request: Request) {
 
   const apiKey = process.env.DEEPSEEK_API_KEY;
   if (!apiKey) {
-    const fallback = isXTraceQuestion(message)
+    const fallback = isFortyTwoQuestion(message)
+      ? await answerFortyTwoFromKnowledge(message)
+      : isXTraceQuestion(message)
       ? await answerXTraceFromKnowledge(message)
       : isSecondExperienceQuestion(message)
         ? await answerFromKnowledge(message)

@@ -10,6 +10,22 @@ const GITHUB = "https://github.com/EnderRomantice";
 
 const EXPERIENCE = [
   {
+    company: "42.ai",
+    domain: "AI hardware startup · accessibility, pets & Alzheimer's care",
+    role: "AI Native Engineer",
+    dates: "Aug 2026 — Present",
+    location: "Chengdu · On-site",
+    badge: "Current",
+    logo: "/logos/42-ai.svg",
+    logoDark: true,
+    bullets: [
+      "Built the team's AI-native engineering workflow across the 42.ai product suite, turning agents into a shared development and operations layer rather than isolated coding assistants.",
+      "Designed a durable TypeScript agent runtime with tool calling, Skills, MCP and ACP integrations, persistent sessions, cancellation, recovery, and concurrent multi-session execution.",
+      "Developed an Electron multi-agent workbench for agent creation, delegation, approvals, local tools, and team collaboration, backed by secure organization, identity, messaging, and model-gateway services.",
+      "Shipped internal and customer-facing products including an AI recruiting system, company and application sites, and community activity tooling, covering full-stack architecture, automation, accessibility, and deployment.",
+    ],
+  },
+  {
     company: "Creatorone",
     domain: "AI-native TikTok Shop platform",
     role: "Full-Stack Developer",
