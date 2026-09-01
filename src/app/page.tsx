@@ -16,7 +16,7 @@ const EXPERIENCE = [
     dates: "Aug 2026 — Present",
     location: "Chengdu · On-site",
     badge: "Current",
-    logo: "/logos/42-ai.svg",
+    logo: "/logos/42-ai.png",
     logoDark: true,
     bullets: [
       "Built the team's AI-native engineering workflow across the 42.ai product suite, turning agents into a shared development and operations layer rather than isolated coding assistants.",
