@@ -12,7 +12,7 @@ topics: AI Native, Agent Runtime, ACP, MCP, Multi-Agent, Electron, AI Hardware, 
 
 # 我的角色
 
-我担任 AI Native 工程师，从 0 到 1 构建团队的 Agent 工作流。工作覆盖 `/Users/code/42-club` 下的项目：单 Agent 执行底座、多 Agent 桌面工作台、团队协作后端、AI 招聘系统、公司官网与申请流程，以及社群活动平台。
+我担任软件技术 Leader，从 0 到 1 构建团队的 Agent 工作流，并负责软件技术方向与工程落地。工作覆盖 `/Users/code/42-club` 下的项目：单 Agent 执行底座、多 Agent 桌面工作台、团队协作后端、AI 招聘系统、公司官网与申请流程，以及社群活动平台。
 
 # 核心工作
 

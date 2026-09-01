@@ -12,7 +12,7 @@ GitHub：https://github.com/EnderRomantice ｜ 成都
 
 ## 实习 / 项目经历
 
-### 42.ai ｜ AI Native 工程师 ｜ 2026.08 - 至今
+### 42.ai ｜ 软件技术 Leader ｜ 2026.08 - 至今
 
 聚焦视障辅助、宠物智能与阿尔茨海默照护赛道的 AI 硬件初创公司。
 

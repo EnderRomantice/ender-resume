@@ -12,7 +12,7 @@ const EXPERIENCE = [
   {
     company: "42.ai",
     domain: "AI hardware startup · accessibility, pets & Alzheimer's care",
-    role: "AI Native Engineer",
+    role: "Software Engineering Lead",
     dates: "Aug 2026 — Present",
     location: "Chengdu · On-site",
     badge: "Current",
