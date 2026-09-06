@@ -1,7 +1,7 @@
 # Ender Romantice
 
 手机：13402832871 ｜ 微信：EnRomantice ｜ 邮箱：enderromantic@gmail.com  
-GitHub：https://github.com/EnderRomantice ｜ 成都
+GitHub：https://github.com/EnderRomantice ｜ Chengdu
 
 ## 技术栈
 
@@ -12,16 +12,16 @@ GitHub：https://github.com/EnderRomantice ｜ 成都
 
 ## 实习 / 项目经历
 
-### 42.ai ｜ 软件技术 Leader ｜ 2026.08 - 至今
+### 42 ｜ 全栈开发工程师 / 负责人 ｜ 2026.08 - 至今 ｜ Beijing · Remote
 
-聚焦视障辅助、宠物智能与阿尔茨海默照护赛道的 AI 硬件初创公司。
+聚焦视障辅助、宠物智能与阿尔茨海默照护的 AI 硬件初创公司；负责全栈开发与产品交付。
 
-- 从 0 到 1 构建团队的 AI Native 研发工作流，将 Agent 从个人编码助手升级为覆盖研发、协作与运营的共享基础设施。
-- 设计并实现 TypeScript Agent Runtime，支持 Tool Calling、Skills、MCP / ACP、多会话并发、持久化、取消与故障恢复，为多个业务 Agent 提供统一执行底座。
-- 开发 Electron 多 Agent 工作台，打通 Agent 创建与委派、工具审批、本地执行和团队协作；配套建设账号、组织、消息、权限及 Model Gateway 服务。
-- 交付 AI 招聘系统、公司官网与申请流程、社群活动平台等内部及用户侧产品，覆盖全栈架构、自动化、无障碍体验与部署。
+- 面向候选人材料分散、初筛与检索依赖人工的问题，从 0 到 1 上线招聘运营后台，串联材料收集、批量导入去重、分析评分、自然语言搜索与流程推进，并按 Admin / Recruiter / Viewer 三类角色提供权限。
+- 完成双语品牌与招聘申请入口，并与已上线招聘后台完成接口联调，形成从公司介绍、材料提交到候选人评估的完整链路；新版入口待上线公司主域名。
+- 面向分布式成员跨城、可用时间难协调的问题，上线活动运营 MVP，自动汇总城市分布与日期交集，并支持成员 / 访客身份、活动配置与报名管理。
+- 面向多 Agent 分散运行、任务中断和本地工具执行缺少集中审批的问题，完成可安装的桌面工作台早期 Alpha 与已部署的协作服务 MVP，并交付 macOS / Windows 测试包。
 
-### Creatorone ｜ 全栈开发 ｜ 2026.02 - 2026.06
+### Creatorone ｜ 全栈开发 ｜ 2026.02 - 2026.06 ｜ Seattle · Remote
 
 AI Native TikTok Shop 平台，面向北美市场远程协作开发。
 
@@ -31,7 +31,7 @@ AI Native TikTok Shop 平台，面向北美市场远程协作开发。
 - 编排 TikTok Shop 卖家与达人自动化相关的 AI Agent 工作流，包含系统提示词、Memory、工具调用、任务执行和多轮上下文处理。
 - 在远程英文协作环境中推进需求拆解、功能实现和问题修复，能够根据产品目标独立完成模块闭环。
 
-### XTrace ｜ 前端开发实习生 ｜ 2025.12 - 2026.02
+### XTrace ｜ 前端开发实习生 ｜ 2025.12 - 2026.02 ｜ San Francisco · Remote
 
 硅谷 AI Startup，专注 AI Memory 垂直方向，面向北美市场远程协作开发。
 
@@ -103,7 +103,7 @@ GitHub：https://github.com/antfu/skills-npm
 - 真实姓名：目前简历只能使用 Ender Romantice，正式投递最好写中文姓名。
 - 目标岗位：前端实习、全栈实习、AI 应用开发实习需要略微调整重点。
 - 专业名称、预计毕业时间、GPA 或排名：如果成绩不突出，可以只写专业和毕业时间。
-- Creatorone / XTrace 的可量化成果：例如负责多少个页面、多少个接口、多少张表、支持多少类角色、减少了多少重复开发。
+- 42 / Creatorone / XTrace 的可量化成果：例如真实使用人数、处理量、流程耗时变化、负责边界与上线状态；不要估算或虚构数字。
 - 开源项目数据：react-bits、vue-grab、skill-npm 的 star、PR 数、贡献链接、npm 下载量或使用量。
 - 项目链接：个人网站线上地址、GitHub 仓库地址、可展示截图或 Demo。
 - 英语能力：远程北美项目如果涉及英文沟通，可以补充英文读写/会议/文档能力。

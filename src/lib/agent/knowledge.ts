@@ -50,7 +50,7 @@ export function isSecondExperienceQuestion(question: string) {
 
 export function isFortyTwoQuestion(question: string) {
   const normalized = question.toLowerCase();
-  return ["42.ai", "42ai", "42 agent", "42-agent", "agent desktop", "agent runtime", "多 agent 工作台"].some(
+  return ["42", "42.ai", "42ai", "42 agent", "42-agent", "agent desktop", "agent runtime", "多 agent 工作台"].some(
     (topic) => normalized.includes(topic),
   );
 }
@@ -83,22 +83,22 @@ function compact(value: string) {
 export async function answerFortyTwoFromKnowledge(question: string) {
   const markdown = await readFile(FORTY_TWO_SOURCE_PATH, "utf8");
   const normalized = question.toLowerCase();
-  let headings = ["公司与方向", "我的角色", "核心工作", "技术与架构亮点"];
-  let lead = "我在 42.ai 负责从 0 到 1 构建 AI Native 团队的 Agent 工作流。";
+  let headings = ["公司与方向", "我的角色", "解决的问题与产出"];
+  let lead = "我在 42 负责全栈开发与产品交付，核心产出覆盖招聘流程、社群运营和团队 Agent 协作。";
 
   if (/简短|概括|介绍|一分钟|1分钟/.test(normalized)) {
     headings = ["面试时的简短版本"];
     lead = "简单说：";
   } else if (/架构|runtime|acp|mcp|技术|设计/.test(normalized)) {
-    headings = ["核心工作", "技术与架构亮点"];
-    lead = "这套系统分成 Agent 执行底座、产品级编排和团队协作服务三层。";
+    headings = ["解决的问题与产出", "实现方式", "技术与架构亮点"];
+    lead = "我先说明要解决的团队问题，再讲系统如何实现：";
   }
 
   const selected = headings.map((heading) => ({ heading, body: compact(section(markdown, heading)) }));
   const answer = `${lead}\n\n${selected.map(({ body }) => body).join("\n\n")}`;
   const sources: AgentSource[] = selected.map(({ heading, body }) => ({
     id: `work-experience-01-${heading}`,
-    title: `42.ai 工作经历 · ${heading}`,
+    title: `42 工作经历 · ${heading}`,
     excerpt: body.slice(0, 118) + (body.length > 118 ? "…" : ""),
   }));
 
