@@ -53,7 +53,7 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(178px, 1fr));
+  grid-template-columns: repeat(5, minmax(190px, 1fr));
   gap: 12px;
   list-style: none;
   margin: 0;
@@ -93,12 +93,12 @@
 .rankingTrigger:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 
 .arrow { flex-shrink: 0; align-self: flex-start; margin-top: 2px; font-size: 14px; line-height: 1; color: #999; }
-.identity { display: flex; align-items: center; gap: 8px; min-width: 0; }
-.repoIcon { display: inline-flex; flex: 0 0 18px; color: #505050; }
-.identityText { flex: 1; min-width: 0; }
+.identity { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.repoIcon { display: inline-flex; flex: 0 0 28px; color: #505050; }
+.identityText { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
 .owner { display: block; color: #808080; font-size: 10px; line-height: 1.4; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .name { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font: 600 21px/1.2 var(--font-display), Georgia, serif; color: var(--ink); }
-.description { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; color: var(--muted); font-size: 12px; line-height: 1.4; margin-top: 9px; }
+.description { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; color: var(--muted); font-size: 12px; line-height: 1.4; margin-top: 12px; }
 .stats { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; padding-top: 14px; font-size: 11px; font-variant-numeric: tabular-nums; }
 .stats > span { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
 .statLabel { color: #808080; }
