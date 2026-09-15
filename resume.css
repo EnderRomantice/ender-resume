@@ -4,15 +4,13 @@
 }
 
 :root {
-  --bg: #ffffff;
-  --ink: #0a0a0a;
-  --muted: #686868;
-  --soft: #8d8d8d;
-  --line: #e5e5e5;
-  --panel: #0a0a0a;
-  --panel-ink: #fafafa;
-  --paper-x: 15mm;
-  --paper-y: 12mm;
+  --ink: #101010;
+  --muted: #656565;
+  --soft: #8b8b8b;
+  --line: #dedede;
+  --accent: #151515;
+  --paper-x: 13.5mm;
+  --paper-y: 11mm;
 }
 
 * {
@@ -22,12 +20,11 @@
 html,
 body {
   margin: 0;
-  background: var(--bg);
+  background: #fff;
   color: var(--ink);
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
-  font-size: 9.2pt;
-  line-height: 1.42;
-  letter-spacing: 0;
+  font-size: 9.05pt;
+  line-height: 1.4;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -43,104 +40,126 @@ a {
 
 .page {
   width: 210mm;
+  min-height: 297mm;
   padding: var(--paper-y) var(--paper-x);
   background: #fff;
 }
 
 .hero {
   display: grid;
-  grid-template-columns: 1fr 72mm;
-  gap: 12mm;
-  align-items: stretch;
-  padding-bottom: 7mm;
-  border-bottom: 1px solid var(--line);
+  grid-template-columns: minmax(0, 1fr) 68mm;
+  gap: 8mm;
+  padding-bottom: 4.5mm;
+  border-bottom: 1.4px solid var(--accent);
+}
+
+.identity {
+  min-width: 0;
 }
 
 .eyebrow,
-.metaLabel,
+.contact,
 .sectionIndex,
 .dates,
-.tag,
-.link {
+.projectHead span {
   font-family: ui-monospace, "SFMono-Regular", "SF Mono", Menlo, Consolas, monospace;
 }
 
 .eyebrow {
-  margin: 0 0 4mm;
+  margin: 0 0 1.8mm;
   color: var(--muted);
-  font-size: 7.8pt;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  font-size: 6.9pt;
+  letter-spacing: 0.14em;
 }
 
 h1 {
-  max-width: 9ch;
-  margin: 0 0 5mm;
+  margin: 0 0 2.3mm;
   font-family: Georgia, "Times New Roman", "Songti SC", serif;
-  font-size: 34pt;
+  font-size: 27pt;
   font-weight: 600;
-  line-height: 0.92;
-  letter-spacing: 0;
+  line-height: 1;
 }
 
 .summary {
-  max-width: 70mm;
+  max-width: 112mm;
   margin: 0;
-  color: #2a2a2a;
-  font-size: 10.2pt;
-  line-height: 1.62;
+  color: #303030;
+  font-size: 9.1pt;
+  line-height: 1.52;
 }
 
-.contactPanel {
+.contact {
   display: grid;
-  align-content: space-between;
-  padding: 8mm;
-  color: var(--panel-ink);
-  background: var(--panel);
+  align-content: start;
+  gap: 0.75mm;
+  margin: 0;
+  padding: 0.4mm 0 0;
+  color: #373737;
+  font-size: 7.1pt;
+  font-style: normal;
+  line-height: 1.25;
 }
 
 .contactTitle {
-  margin: 0 0 5mm;
+  display: flex;
+  align-items: baseline;
+  gap: 2mm;
+  margin: 0 0 1.2mm;
+  color: var(--ink);
   font-family: Georgia, "Times New Roman", "Songti SC", serif;
-  font-size: 15pt;
-  font-weight: 600;
+  font-size: 10.2pt;
+  font-weight: 700;
 }
 
-.contactGrid {
-  display: grid;
-  gap: 2.8mm;
-}
-
-.contactItem {
-  min-width: 0;
-}
-
-.metaLabel {
-  display: block;
-  margin-bottom: 0.8mm;
-  color: #929292;
-  font-size: 6.9pt;
-  letter-spacing: 0.13em;
+.contactTitle span {
+  color: var(--soft);
+  font-family: ui-monospace, "SFMono-Regular", "SF Mono", Menlo, Consolas, monospace;
+  font-size: 5.8pt;
+  font-weight: 500;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
-.metaValue {
-  display: block;
-  overflow-wrap: anywhere;
-  font-size: 8.7pt;
-  line-height: 1.35;
+.contactItem {
+  display: grid;
+  grid-template-columns: 3.6mm 10mm minmax(0, 1fr);
+  gap: 1mm;
+  align-items: center;
+  min-width: 0;
+  min-height: 3.25mm;
 }
 
-.content {
-  display: grid;
-  gap: 5.5mm;
-  padding-top: 6mm;
+.contactItem svg {
+  width: 3.2mm;
+  height: 3.2mm;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.6;
+}
+
+.contactGitHub svg {
+  fill: currentColor;
+  stroke: none;
+}
+
+.contactLabel {
+  color: var(--soft);
+  font-size: 6.25pt;
+  font-weight: 650;
+}
+
+.contactValue {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .section {
   display: grid;
-  grid-template-columns: 25mm 1fr;
-  gap: 8mm;
+  grid-template-columns: 24mm minmax(0, 1fr);
+  gap: 6.5mm;
+  padding-top: 4.15mm;
   break-inside: avoid-page;
 }
 
@@ -149,27 +168,141 @@ h1 {
 }
 
 .sectionHead {
-  padding-top: 0.6mm;
+  padding-top: 0.2mm;
 }
 
 .sectionIndex {
   display: block;
-  margin-bottom: 1.5mm;
+  margin-bottom: 0.8mm;
   color: var(--soft);
-  font-size: 7.4pt;
+  font-size: 6.6pt;
 }
 
 h2 {
   margin: 0;
   font-family: Georgia, "Times New Roman", "Songti SC", serif;
-  font-size: 13.2pt;
+  font-size: 11.6pt;
   font-weight: 600;
-  line-height: 1.12;
-  letter-spacing: 0;
+  line-height: 1.08;
 }
 
 .sectionBody {
   min-width: 0;
+}
+
+.skills {
+  display: grid;
+  gap: 1.3mm;
+}
+
+.skillRow {
+  display: grid;
+  grid-template-columns: 17mm 1fr;
+  gap: 3.5mm;
+}
+
+.skillRow strong {
+  font-weight: 680;
+}
+
+.skillRow span {
+  color: #303030;
+}
+
+.item {
+  display: grid;
+  grid-template-columns: 26mm minmax(0, 1fr);
+  gap: 5.5mm;
+  padding: 2.8mm 0 0;
+  margin-top: 2.8mm;
+  border-top: 1px solid var(--line);
+  break-inside: avoid;
+}
+
+.item:first-child {
+  padding-top: 0;
+  margin-top: 0;
+  border-top: 0;
+}
+
+.dates {
+  color: var(--muted);
+  font-size: 6.7pt;
+  line-height: 1.3;
+}
+
+.location {
+  margin-top: 1mm;
+  color: var(--soft);
+  font-size: 6.8pt;
+}
+
+.itemTitle,
+.projectHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4mm;
+}
+
+h3 {
+  margin: 0;
+  font-size: 9.9pt;
+  font-weight: 730;
+  line-height: 1.2;
+}
+
+.itemTitle > span {
+  flex: 0 0 auto;
+  font-size: 8.35pt;
+  font-weight: 650;
+}
+
+.domain {
+  margin: 0.55mm 0 1.35mm;
+  color: var(--muted);
+  font-size: 7.7pt;
+}
+
+ul {
+  margin: 0;
+  padding-left: 3.8mm;
+}
+
+li {
+  margin: 0 0 0.65mm;
+  padding-left: 0.35mm;
+}
+
+li:last-child {
+  margin-bottom: 0;
+}
+
+.openSourceList {
+  display: grid;
+  gap: 2.15mm;
+}
+
+.project {
+  break-inside: avoid;
+}
+
+.projectHead span {
+  flex: 0 0 auto;
+  color: var(--muted);
+  font-size: 6.7pt;
+  text-transform: uppercase;
+}
+
+.project p {
+  margin: 0.45mm 0 0;
+  color: #303030;
+}
+
+.educationSection {
+  margin-top: 3.4mm;
+  padding-top: 3.1mm;
+  border-top: 1px solid var(--line);
 }
 
 .education {
@@ -178,149 +311,12 @@ h2 {
   gap: 3mm;
 }
 
-.school {
-  font-size: 9.4pt;
-  font-weight: 650;
+.education strong {
+  font-size: 9pt;
 }
 
-.educationSection {
-  padding-top: 3.5mm;
-  border-top: 1px solid var(--line);
-}
-
-.muted {
+.education span {
   color: var(--muted);
-}
-
-.skills {
-  display: grid;
-  gap: 2.8mm;
-}
-
-.skillRow {
-  display: grid;
-  grid-template-columns: 20mm 1fr;
-  gap: 5mm;
-}
-
-.skillName {
-  color: var(--ink);
-  font-weight: 650;
-}
-
-.skillText {
-  color: #2b2b2b;
-}
-
-.item {
-  display: grid;
-  grid-template-columns: 29mm 1fr;
-  gap: 7mm;
-  padding-top: 3.4mm;
-  border-top: 1px solid var(--line);
-  break-inside: avoid;
-}
-
-.item:first-child {
-  padding-top: 0;
-  border-top: 0;
-}
-
-.dates {
-  color: var(--muted);
-  font-size: 7.6pt;
-  line-height: 1.35;
-}
-
-.location {
-  margin-top: 1.8mm;
-  color: var(--soft);
-  font-size: 7.6pt;
-}
-
-h3 {
-  margin: 0 0 1mm;
-  font-size: 10.8pt;
-  font-weight: 720;
-  line-height: 1.25;
-}
-
-.domain {
-  margin: 0 0 2.4mm;
-  color: var(--muted);
-  font-size: 8.4pt;
-}
-
-ul {
-  margin: 0;
-  padding-left: 4.2mm;
-}
-
-li {
-  margin: 0 0 1.1mm;
-  padding-left: 0.5mm;
-}
-
-li:last-child {
-  margin-bottom: 0;
-}
-
-.portfolioGrid,
-.openSourceGrid {
-  display: grid;
-  gap: 3.4mm;
-}
-
-.portfolioCard,
-.openSourceCard {
-  padding-top: 3.4mm;
-  border-top: 1px solid var(--line);
-  break-inside: avoid;
-}
-
-.portfolioCard:first-child,
-.openSourceCard:first-child {
-  padding-top: 0;
-  border-top: 0;
-}
-
-.cardTop {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 5mm;
-  margin-bottom: 1.3mm;
-}
-
-.cardTitle {
-  margin: 0;
-  font-size: 10.8pt;
-  font-weight: 720;
-}
-
-.tag {
-  flex: 0 0 auto;
-  color: var(--muted);
-  font-size: 7.2pt;
-  text-transform: uppercase;
-}
-
-.link {
-  display: block;
-  margin-bottom: 2mm;
-  color: var(--muted);
-  font-size: 7.4pt;
-}
-
-.compactText {
-  margin: 0 0 2mm;
-  color: #2b2b2b;
-}
-
-.notes {
-  margin-top: 1.4mm;
-  color: var(--muted);
-  font-size: 8.2pt;
 }
 
 @media print {

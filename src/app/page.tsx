@@ -19,10 +19,9 @@ const EXPERIENCE = [
     logo: "/logos/42-ai.png",
     logoDark: true,
     bullets: [
-      "Launched a recruiting operations system to replace fragmented candidate materials and manual screening and search, connecting intake, bulk import and deduplication, structured scoring, natural-language search, and pipeline tracking with permissions for three internal roles.",
-      "Completed a bilingual brand and job-application experience and integrated it with the live recruiting backend, creating a flow from company story and document submission to candidate evaluation; main-domain launch is pending.",
-      "Launched an events-operations MVP for a geographically distributed community, resolving cross-city scheduling by aggregating cities and availability, finding common dates, and managing registration.",
-      "Completed an installable early alpha of a desktop multi-agent workbench plus a deployed collaboration-service MVP, centralizing agent coordination, task recovery, and approval of local tool execution; produced macOS and Windows test builds.",
+      "Designed and built a desktop multi-agent workbench that separates conversation, planning, and tool execution. Parallel background tasks, mid-task instructions, and result reporting keep long-running work from blocking user interaction; delivered macOS and Windows alpha test builds.",
+      "Built a TypeScript agent runtime with ordered per-session scheduling, parallel tools, and exclusive execution controls. Checkpoint reconciliation handles process interruptions and ambiguous database commits, restoring persisted results without automatically replaying operations with uncertain outcomes.",
+      "Built a recruiting agent connecting document intake, candidate creation, and natural-language screening. Role-level and evidence-aware evaluation, server-recomputed scores, and evidence-based score caps constrain assessments; saved rationales and tool traces support recruiter review.",
     ],
   },
   {
@@ -35,10 +34,9 @@ const EXPERIENCE = [
     logo: "/logos/creatorone.svg",
     logoDark: false,
     bullets: [
-      "Built an AI-native TikTok Shop platform from 0 to 1, covering frontend architecture, backend APIs, authentication, authorization, database schema design, and AI agent workflows.",
-      "Developed multi-page business dashboard flows with internationalization, analytics tracking, state management, reusable business components, and polished interaction details.",
-      "Designed backend routing, auth flows, access-control logic, API contracts, and relational data models for secure multi-user business operations.",
-      "Orchestrated AI agent workflows with system prompts, memory, tool calling, and task execution for TikTok Shop seller and creator automation scenarios.",
+      "Contributed to the platform from the ground up across Next.js dashboards, NestJS APIs, authentication and authorization, API contracts, relational data models, and AI agent workflows.",
+      "Implemented multi-page merchant workflows with internationalization, analytics, SWR and Zustand state management, reusable components, and detailed interaction states.",
+      "Contributed to seller and creator automation workflows using system prompts, memory, and constrained tool calls, keeping model reasoning separate from backend permissions and data rules.",
     ],
   },
   {
@@ -51,10 +49,9 @@ const EXPERIENCE = [
     logo: "/logos/xtrace.png",
     logoDark: true,
     bullets: [
-      "Designed and implemented user interfaces for a focused AI memory product, improving usability, interaction clarity, and the overall web experience.",
-      "Built the web Memory Hub and browser-extension experiences that let users manage and reuse memory across AI agents.",
+      "Contributed to the Web Memory Hub and browser-extension interfaces, helping users manage and reuse memory across web-based AI agents.",
       "Supported cross-agent memory sharing through XTrace's MCP service for CLI agents and its browser extension for web-based AI tools.",
-      "Contributed across the complete product flow, including web UX, Memory Hub, browser extension, MCP integration, and agent-feature coordination.",
+      "Worked across web UX, the Memory Hub, browser extension, MCP integration, and agent feature integration.",
     ],
   },
 ];
@@ -62,45 +59,44 @@ const EXPERIENCE = [
 const OPEN_SOURCE = [
   {
     name: "react-bits",
-    rank: "Top 2 Contributor",
-    desc: "Contributed animation components, examples, fixes, and DX improvements to a widely used React animation library.",
+    rank: "Long-standing Top 2 contributor · 10 merged PRs",
+    desc: "Shipped components, API extensions, rendering improvements, and interaction fixes to a widely used React animation library.",
     href: "https://github.com/DavidHDev/react-bits",
     preview: "https://reactbits.dev/",
     previewImage: "/previews/react-bits.png",
-    stars: "42.4k",
+    stars: "47.3k",
     contributions: [
-      "Maintained and refined the existing component library.",
-      "Expanded component APIs and improved prop design for greater flexibility.",
-      "Reproduced, diagnosed, and resolved component and interaction bugs.",
-      "Strengthened the project architecture and developer workflow.",
-      "Designed and shipped original components from concept to release.",
+      "Shipped the original Pixel Swap component.",
+      "Extended the Lanyard and InfiniteMenu APIs.",
+      "Reduced unnecessary rendering work in TextPressure, Shuffle, and AnimatedList.",
+      "Diagnosed and fixed TextCursor interaction issues.",
     ],
   },
   {
     name: "vue-grab",
-    rank: "Project Leader",
-    desc: "Led project direction, component API design, examples, issue triage, and release maintenance for Vue drag interactions.",
+    rank: "Author · Maintainer",
+    desc: "Built and maintain a Vue 3 element-grabbing tool that sends component context into AI coding workflows.",
     href: "https://github.com/EnderRomantice/vue-grab",
     preview: "https://vue-grab.vercel.app/",
     previewImage: "/previews/vue-grab.png",
-    stars: "88",
+    stars: "89",
     contributions: [
-      "Built and maintained the project independently from zero to one.",
-      "Owned the complete architecture, from the core agent system through the framework adaptation layer.",
-      "Led ongoing API design, documentation, releases, and project direction.",
+      "Built the project independently from architecture through release.",
+      "Implemented component tracking, Shadow DOM overlays, hotkeys, and agent bridges.",
+      "Own the API design, documentation, releases, and project direction.",
     ],
   },
   {
     name: "skill-npm",
-    rank: "Top 4 Contributor",
-    desc: "Improved developer-tooling workflows, package behavior, documentation, and contributor experience in the npm ecosystem.",
+    rank: "Contributor · 2 merged PRs",
+    desc: "Improved an npm-based distribution tool for installing Agent Skills across coding agents.",
     href: "https://github.com/antfu/skills-npm",
     preview: "https://www.jsdelivr.com/package/npm/skills-npm",
     previewImage: "/previews/skills-npm.png",
-    stars: "479",
+    stars: "516",
     contributions: [
-      "Improved the early-stage codebase and helped shape its foundational architecture.",
-      "Introduced new capabilities and streamlined key developer workflows.",
+      "Added caching to reduce repeated work and improve perceived performance.",
+      "Added warnings for invalid skills to make failures easier to diagnose.",
       "Contributed during the project’s formative stage; no longer actively involved in maintenance.",
     ],
   },
@@ -167,8 +163,9 @@ export default function Home() {
         <div className={styles.heroLeft}>
           <h1 className={styles.name}>Ender Romantice</h1>
           <p className={styles.lede}>
-            I build <strong>AI-native products</strong>, full-stack systems, open-source React / Vue
-            tools, and polished web experiences that stay useful after the first impression.
+            I build <strong>AI-native products</strong> across Next.js, NestJS, and agent workflows,
+            and contribute to open-source React / Vue tools used by other developers. I am a
+            long-standing Top 2 contributor to React Bits.
           </p>
           <p className={styles.personalNote}>
             Based in Chengdu. Also into rock music, fashion, photography, modeling, coffee, and

@@ -37,7 +37,7 @@ topics: 个人信息, 兴趣, 游戏, 穿搭, 开发方式, 开源
 
 # 开源与开发方式
 
-我是 React Bits 的核心贡献者。
+我是 React Bits 的长期 Top 2 贡献者。
 
 我目前主要使用的开发组合是 herdr（多Agent互相通信的终端工具）、Pi Coding Agent+DeepSeek 和 openai赠送的 ChatGPT Pro。
 

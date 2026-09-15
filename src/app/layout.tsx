@@ -21,9 +21,9 @@ const cormorant = Cormorant_Garamond({
 });
 
 export const metadata: Metadata = {
-  title: "Ender — Full-Stack Developer",
+  title: "Ender — Full-Stack & AI Application Developer",
   description:
-    "Meet Ender, a full-stack and agent developer working with React, Next.js, AI systems, open source, and 3D on the web.",
+    "Ender builds full-stack AI applications with React, Next.js, NestJS, agent workflows, and open-source developer tools.",
 };
 
 export default function RootLayout({

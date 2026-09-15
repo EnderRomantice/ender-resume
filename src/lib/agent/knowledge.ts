@@ -84,7 +84,7 @@ export async function answerFortyTwoFromKnowledge(question: string) {
   const markdown = await readFile(FORTY_TWO_SOURCE_PATH, "utf8");
   const normalized = question.toLowerCase();
   let headings = ["公司与方向", "我的角色", "解决的问题与产出"];
-  let lead = "我在 42 负责全栈开发与产品交付，核心产出覆盖招聘流程、社群运营和团队 Agent 协作。";
+  let lead = "我在 42 负责全栈开发与产品交付，代表性产出是多 Agent 长任务协作、执行可靠性内核，以及证据约束的招聘 Agent。";
 
   if (/简短|概括|介绍|一分钟|1分钟/.test(normalized)) {
     headings = ["面试时的简短版本"];
