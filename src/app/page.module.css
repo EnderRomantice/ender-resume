@@ -105,9 +105,9 @@
 .name {
   max-width: 11ch;
   font-size: clamp(52px, 6.2vw, 76px);
-  line-height: 1.02;
-  letter-spacing: -0.035em;
-  font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 0.92;
+  letter-spacing: 0;
+  font-family: var(--font-display), Georgia, serif;
   font-weight: 600;
   margin-bottom: 26px;
 }
