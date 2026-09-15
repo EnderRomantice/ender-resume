@@ -67,7 +67,7 @@
   --card-press-duration: 80ms;
   display: flex;
   flex-direction: column;
-  height: 204px;
+  height: 176px;
   padding: 17px;
   border: 1px solid var(--line);
   border-radius: 9px;
@@ -90,11 +90,12 @@
 .project:focus-visible,
 .projectViewport:focus-visible,
 .overview a:focus-visible,
-.rankingNote summary:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.rankingTrigger:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 
-.cardTop { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: #505050; margin-bottom: 15px; }
-.arrow { font-size: 14px; line-height: 1; color: #999; }
-.identity { min-width: 0; }
+.arrow { flex-shrink: 0; align-self: flex-start; margin-top: 2px; font-size: 14px; line-height: 1; color: #999; }
+.identity { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.repoIcon { display: inline-flex; flex: 0 0 18px; color: #505050; }
+.identityText { flex: 1; min-width: 0; }
 .owner { display: block; color: #808080; font-size: 10px; line-height: 1.4; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .name { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font: 600 21px/1.2 var(--font-display), Georgia, serif; color: var(--ink); }
 .description { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; color: var(--muted); font-size: 12px; line-height: 1.4; margin-top: 9px; }
@@ -102,11 +103,71 @@
 .stats > span { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
 .statLabel { color: #808080; }
 .gridFooter { margin-top: 7px; margin-bottom: 34px; font-size: 11px; }
-.rankingNote { position: relative; text-align: right; max-width: 410px; }
-.rankingNote summary { cursor: pointer; text-decoration: underline; text-decoration-color: #ccc; text-underline-offset: 3px; }
+.rankingNote {
+  --acc-expand: 180ms;
+  --acc-collapse: 180ms;
+  --acc-chevron: 180ms;
+  --acc-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+  text-align: right;
+  width: 410px;
+  max-width: 100%;
+}
+.rankingTrigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: #ccc;
+  text-underline-offset: 3px;
+}
 .rankingNote p { margin-top: 9px; text-align: left; line-height: 1.6; color: var(--muted); }
 
+.t-acc-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--acc-collapse) var(--acc-ease);
+}
+.t-acc[data-open="true"] .t-acc-panel {
+  grid-template-rows: 1fr;
+  transition: grid-template-rows var(--acc-expand) var(--acc-ease);
+}
+.t-acc-panel-inner {
+  overflow: hidden;
+  opacity: 0;
+  filter: blur(2px);
+  transition:
+    opacity var(--acc-collapse) var(--acc-ease),
+    filter var(--acc-collapse) var(--acc-ease);
+}
+.t-acc[data-open="true"] .t-acc-panel-inner {
+  opacity: 1;
+  filter: blur(0);
+  transition:
+    opacity var(--acc-expand) var(--acc-ease),
+    filter var(--acc-expand) var(--acc-ease);
+}
+.t-acc-chevron {
+  display: inline-flex;
+  transform: scaleY(1);
+  transform-origin: center;
+  transition: transform var(--acc-chevron) var(--acc-ease);
+}
+.t-acc-chevron path { vector-effect: non-scaling-stroke; }
+.t-acc[data-open="true"] .t-acc-chevron {
+  transform: scaleY(-1);
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .t-acc-panel, .t-acc-panel-inner, .t-acc-chevron {
+    transition: none !important;
+  }
   .profileName::after { transition: none; }
   .project { transition: none; }
   .project:hover,

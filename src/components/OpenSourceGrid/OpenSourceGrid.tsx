@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useState } from 'react';
 import type { GitHubPortfolioData } from '@/lib/github-portfolio-types';
 import { isGitHubPortfolioData } from '@/lib/github-portfolio-validation';
 import { rankGitHubProjects } from '@/lib/github-ranking';
@@ -19,6 +19,8 @@ const StarIcon = <svg width="13" height="13" viewBox="0 0 24 24" fill="none" str
 
 export default function OpenSourceGrid({ initialData }: { initialData: GitHubPortfolioData }) {
   const [data, setData] = useState(initialData);
+  const [rankingOpen, setRankingOpen] = useState(false);
+  const rankingPanelId = useId();
   const ranked = useMemo(() => rankGitHubProjects(data.repositories.filter((project) =>
     project.stars >= 50 &&
     project.contributions >= 20 &&
@@ -55,13 +57,13 @@ export default function OpenSourceGrid({ initialData }: { initialData: GitHubPor
           {projects.map((project) => (
             <li key={project.id}>
               <a className={styles.project} href={project.url} target="_blank" rel="noreferrer" aria-label={`${project.fullName} on GitHub`}>
-                <div className={styles.cardTop}>
-                  {GitHubIcon}
-                  <span className={styles.arrow} aria-hidden="true">↗</span>
-                </div>
                 <div className={styles.identity}>
-                  <span className={styles.owner}>{project.fullName.split('/')[0]}</span>
-                  <h3 className={styles.name} title={project.name}>{project.name}</h3>
+                  <span className={styles.repoIcon}>{GitHubIcon}</span>
+                  <div className={styles.identityText}>
+                    <span className={styles.owner}>{project.fullName.split('/')[0]}</span>
+                    <h3 className={styles.name} title={project.name}>{project.name}</h3>
+                  </div>
+                  <span className={styles.arrow} aria-hidden="true">↗</span>
                 </div>
                 <p className={styles.description}>{project.description || (project.isOwner ? 'An open-source project I maintain.' : 'An open-source project I contribute to.')}</p>
                 <div className={styles.stats}>
@@ -79,10 +81,25 @@ export default function OpenSourceGrid({ initialData }: { initialData: GitHubPor
 
       <div className={styles.gridFooter}>
         <span>{projects.length < ranked.length ? `Top ${projects.length} of ${ranked.length} contributed projects` : `${projects.length} contributed projects`} · 50+ stars</span>
-        <details className={styles.rankingNote}>
-          <summary>Contributor rank + stars</summary>
-          <p>Shown projects have at least 50 stars, 20 of my commits, and a top-five contributor rank. Contributor rank and stars each carry 50%. A higher position in GitHub’s commit contributor list scores better (1 ÷ rank). Stars use a logarithmic scale.</p>
-        </details>
+        <div className={`${styles.rankingNote} ${styles['t-acc']}`} data-open={rankingOpen}>
+          <button
+            type="button"
+            className={styles.rankingTrigger}
+            aria-expanded={rankingOpen}
+            aria-controls={rankingPanelId}
+            onClick={() => setRankingOpen((open) => !open)}
+          >
+            <span className={styles['t-acc-chevron']} aria-hidden="true">
+              <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M4 6.5L8 10.5L12 6.5" /></svg>
+            </span>
+            Contributor rank + stars
+          </button>
+          <div id={rankingPanelId} className={styles['t-acc-panel']} aria-hidden={!rankingOpen} inert={!rankingOpen}>
+            <div className={styles['t-acc-panel-inner']}>
+              <p>Shown projects have at least 50 stars, 20 of my commits, and a top-five contributor rank. Contributor rank and stars each carry 50%. A higher position in GitHub’s commit contributor list scores better (1 ÷ rank). Stars use a logarithmic scale.</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <ContributionHeatmap calendar={data.calendar} />
