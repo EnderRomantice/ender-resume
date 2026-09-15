@@ -1,7 +1,6 @@
 import Image from "next/image";
 import PageParticleScroll from "@/components/PageParticleScroll/PageParticleScroll";
 import PortfolioAgent from "@/components/PortfolioAgent/PortfolioAgent";
-import GlobalLanyard from "@/components/Lanyard/GlobalLanyard";
 import OpenSourceGrid from "@/components/OpenSourceGrid/OpenSourceGrid";
 import githubSnapshot from "@/data/github-portfolio.json";
 import type { GitHubPortfolioData } from "@/lib/github-portfolio-types";
@@ -155,8 +154,7 @@ export default function Home() {
             <section key={group.id} className={styles.experienceGroup} aria-labelledby={`experience-${group.id}`}>
               <h3 id={`experience-${group.id}`} className={styles.experienceGroupTitle}>{group.title}</h3>
               {EXPERIENCE.filter((job) => job.employmentType === group.id).map((job) => (
-                <article key={job.company} className={`${styles.role} ${job.badge === "Current" ? styles.lanyardRole : ""}`}>
-                  {job.badge === "Current" && <GlobalLanyard role={job.role} company={job.company} />}
+                <article key={job.company} className={styles.role}>
                   <aside className={styles.roleAside}>
                     <div className={`${styles.logoBox} ${job.logoDark ? styles.logoBoxDark : ""}`}>
                       <Image src={job.logo} alt={`${job.company} logo`} width={30} height={30} />
@@ -164,7 +162,7 @@ export default function Home() {
                     <span className={styles.roleDates}>{job.dates}</span>
                     <span className={styles.roleLocation}>{job.location}</span>
                   </aside>
-                  <div className={styles.roleBody}>
+                  <div>
                     <h4 className={styles.roleTitle}>{job.role}</h4>
                     <p className={styles.roleCompany}>
                       {job.company}

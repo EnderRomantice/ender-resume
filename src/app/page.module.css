@@ -147,7 +147,7 @@
   color: var(--muted);
 }
 
-/* right = black stage holding the lanyard */
+/* Hero map and conversation panel */
 .heroRight {
   position: relative;
   background: var(--bg);
@@ -216,26 +216,6 @@
   gap: 32px;
   padding: 32px 0;
   border-top: 1px solid var(--line);
-}
-
-.lanyardRole {
-  border-top: 0;
-}
-
-.lanyardRole::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 1px;
-  background: var(--line);
-}
-
-.roleAside,
-.roleBody {
-  position: relative;
-  z-index: 3;
 }
 
 .roleAside {

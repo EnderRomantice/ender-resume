@@ -5,29 +5,6 @@ import Dither from './Dither';
 import styles from './GlobalLoadingScreen.module.css';
 
 const MAX_WAIT_MS = 20000;
-const LANYARD_ASSETS = ['/lanyard/card.glb', '/lanyard/lanyard.png', '/ender.jpg'];
-
-function preloadImage(src: string) {
-  return new Promise<void>((resolve) => {
-    const image = new Image();
-    image.onload = () => resolve();
-    image.onerror = () => resolve();
-    image.src = src;
-  });
-}
-
-function preloadFetch(src: string) {
-  return fetch(src, { cache: 'force-cache' }).then(
-    () => undefined,
-    () => undefined
-  );
-}
-
-function preloadLanyardAssets() {
-  return Promise.all(LANYARD_ASSETS.map((asset) => (asset.endsWith('.glb') ? preloadFetch(asset) : preloadImage(asset)))).then(
-    () => undefined
-  );
-}
 
 export default function GlobalLoadingScreen() {
   const [isReady, setIsReady] = useState(false);
@@ -37,10 +14,9 @@ export default function GlobalLoadingScreen() {
     let cancelled = false;
     let mapReady = false;
     let pageReady = document.readyState === 'complete';
-    let lanyardReady = false;
 
     const maybeFinish = () => {
-      if (cancelled || !mapReady || !pageReady || !lanyardReady) return;
+      if (cancelled || !mapReady || !pageReady) return;
       setIsReady(true);
     };
 
@@ -56,11 +32,6 @@ export default function GlobalLoadingScreen() {
 
     window.addEventListener('ender:map-ready', onMapReady, { once: true });
     window.addEventListener('load', onPageLoad, { once: true });
-
-    preloadLanyardAssets().then(() => {
-      lanyardReady = true;
-      maybeFinish();
-    });
 
     const maxWait = window.setTimeout(() => {
       if (!cancelled) setIsReady(true);
