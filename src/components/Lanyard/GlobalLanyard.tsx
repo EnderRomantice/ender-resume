@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { greatVibes, instrumentSans } from '@/app/fonts';
+import { cormorant, instrumentSans } from '@/app/fonts';
 import LanyardScene from './LanyardScene';
 import styles from './GlobalLanyard.module.css';
 
@@ -16,11 +16,11 @@ export default function GlobalLanyard({ role, company }: { role: string; company
     // Canvas text must be redrawn after the actual font is available.
     Promise.all([
       document.fonts.load(`400 86px ${instrumentSans.style.fontFamily}`),
-      document.fonts.load(`400 136px ${greatVibes.style.fontFamily}`),
+      document.fonts.load(`400 136px ${cormorant.style.fontFamily}`),
     ]).then(() => {
       if (!cancelled) setFonts({
         body: instrumentSans.style.fontFamily,
-        name: greatVibes.style.fontFamily,
+        name: cormorant.style.fontFamily,
       });
     }).catch(() => {
       // Keep the readable fallback if the font request fails.
