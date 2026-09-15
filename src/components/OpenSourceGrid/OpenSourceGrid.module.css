@@ -102,6 +102,12 @@
 .description { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; color: var(--muted); font-size: 12px; line-height: 1.4; margin-top: 12px; }
 .stats { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; padding-top: 14px; font-size: 11px; font-variant-numeric: tabular-nums; }
 .stats > span { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+.starCount svg {
+  display: block;
+  flex-shrink: 0;
+  /* Align the outline with the digits' ink, rather than the font's line box. */
+  transform: translateY(-1px);
+}
 .statLabel { color: #808080; }
 .gridFooter { margin-top: 7px; margin-bottom: 34px; font-size: 11px; }
 .rankingNote {

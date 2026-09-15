@@ -69,7 +69,7 @@ export default function OpenSourceGrid({ initialData }: { initialData: GitHubPor
                 </div>
                 <p className={styles.description}>{project.description || (project.isOwner ? 'An open-source project I maintain.' : 'An open-source project I contribute to.')}</p>
                 <div className={styles.stats}>
-                  <span title={`${project.stars.toLocaleString('en')} stars`} aria-label={`${project.stars} stars`}>{StarIcon}{compactNumber.format(project.stars)}</span>
+                  <span className={styles.starCount} title={`${project.stars.toLocaleString('en')} stars`} aria-label={`${project.stars} stars`}>{StarIcon}<span>{compactNumber.format(project.stars)}</span></span>
                   <span title={project.contributorRank ? `#${project.contributorRank} in GitHub’s commit contributor list` : 'No commit contributor rank available from GitHub'}>
                     {project.contributorRank ? `#${project.contributorRank}` : null}
                     <span className={styles.statLabel}>{project.contributorRank ? 'contributor' : 'Contributor'}</span>
