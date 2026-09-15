@@ -17,8 +17,8 @@ export function createProfileCard(avatar: HTMLImageElement, profile: Omit<CardPr
   if (!ctx) return null;
 
   const paper = ctx.createLinearGradient(0, 0, 1080, 1520);
-  paper.addColorStop(0, '#fafafb');
-  paper.addColorStop(1, '#ededf0');
+  paper.addColorStop(0, '#fcfcfc');
+  paper.addColorStop(1, '#f8f8f8');
   ctx.fillStyle = paper;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
