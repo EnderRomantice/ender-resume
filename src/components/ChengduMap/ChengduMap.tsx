@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useImperativeHandle, useLayoutEffect, useRef, type Ref } from 'react';
 import type { Map as MapLibreMap, Marker as MapLibreMarker } from 'maplibre-gl';
 import styles from './ChengduMap.module.css';
 
@@ -8,11 +8,49 @@ const CURRENT_LOCATION: [number, number] = [104.2746, 30.5565];
 const MAP_STYLE = 'https://tiles.openfreemap.org/styles/dark';
 const announceMapReady = () => window.dispatchEvent(new Event('ender:map-ready'));
 
-export default function ChengduMap() {
+export type ChengduMapHandle = { redraw: () => void };
+
+export default function ChengduMap({ paused = false, ref }: { paused?: boolean; ref?: Ref<ChengduMapHandle> }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const markerRefs = useRef<MapLibreMarker[]>([]);
   const zoomTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const pausedRef = useRef(paused);
+  const isInViewRef = useRef(false);
+
+  useImperativeHandle(ref, () => ({
+    redraw: () => mapRef.current?.redraw(),
+  }), []);
+
+  useLayoutEffect(() => {
+    pausedRef.current = paused;
+    if (paused || !isInViewRef.current || document.hidden) mapRef.current?.stop();
+    // Replace the snapshot with a fresh WebGL frame before the visible layer
+    // paints, including after the browser discarded a hidden canvas buffer.
+    else mapRef.current?.redraw();
+  }, [paused]);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const syncVisibility = () => {
+      if (pausedRef.current || !isInViewRef.current || document.hidden) mapRef.current?.stop();
+      else mapRef.current?.redraw();
+    };
+
+    const observer = new IntersectionObserver(([entry]) => {
+      isInViewRef.current = entry.isIntersecting;
+      syncVisibility();
+    });
+    observer.observe(container);
+    document.addEventListener('visibilitychange', syncVisibility);
+
+    return () => {
+      observer.disconnect();
+      document.removeEventListener('visibilitychange', syncVisibility);
+    };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -39,6 +77,7 @@ export default function ChengduMap() {
 
       stopAutoZoom();
       zoomTimerRef.current = setInterval(() => {
+        if (pausedRef.current || !isInViewRef.current || document.hidden) return;
         const direction = nextZoomDirection();
         streak = direction === lastDirection ? streak + 1 : 1;
         lastDirection = direction;

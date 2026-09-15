@@ -5,7 +5,7 @@ import Dither from './Dither';
 import styles from './GlobalLoadingScreen.module.css';
 
 const MAX_WAIT_MS = 20000;
-const LANYARD_ASSETS = ['/lanyard/card.glb', '/lanyard/lanyard.png', '/card-front.png'];
+const LANYARD_ASSETS = ['/lanyard/card.glb', '/lanyard/lanyard.png', '/ender.jpg'];
 
 function preloadImage(src: string) {
   return new Promise<void>((resolve) => {
@@ -24,7 +24,7 @@ function preloadFetch(src: string) {
 }
 
 function preloadLanyardAssets() {
-  return Promise.all(LANYARD_ASSETS.map((asset) => (asset.endsWith('.png') ? preloadImage(asset) : preloadFetch(asset)))).then(
+  return Promise.all(LANYARD_ASSETS.map((asset) => (asset.endsWith('.glb') ? preloadFetch(asset) : preloadImage(asset)))).then(
     () => undefined
   );
 }

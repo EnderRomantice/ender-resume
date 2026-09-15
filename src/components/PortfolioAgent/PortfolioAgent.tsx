@@ -4,7 +4,8 @@ import { FormEvent, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { layout, prepare } from "@chenglou/pretext";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import ChengduMap from "@/components/ChengduMap/ChengduMap";
+import ChengduMap, { type ChengduMapHandle } from "@/components/ChengduMap/ChengduMap";
+import PixelSwap from "@/components/PixelSwap/PixelSwap";
 import styles from "./PortfolioAgent.module.css";
 
 type Phase = "map" | "dissolving" | "restoring" | "ready" | "thinking" | "answer";
@@ -41,12 +42,6 @@ const PIXEL_DELAYS = Array.from({ length: 9 }, (_, index) => {
   const column = index % 3;
   return (column + Math.abs(row - 1)) * 90;
 });
-
-const TRANSITION_PIXELS = Array.from({ length: 144 }, (_, index) => ({
-  id: index,
-  delay: ((index * 73 + index * index * 17) % 73) * 10,
-  exitDelay: ((index * 31 + index * index * 11) % 73) * 5,
-}));
 
 function useElapsed() {
   const [deciseconds, setDeciseconds] = useState(0);
@@ -164,21 +159,20 @@ export default function PortfolioAgent() {
   const [answer, setAnswer] = useState("");
   const [error, setError] = useState("");
   const [hasAsked, setHasAsked] = useState(false);
-  const [transitionCovered, setTransitionCovered] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [suggestionsReady, setSuggestionsReady] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const formMoverRef = useRef<HTMLDivElement>(null);
   const formTopRef = useRef<number | null>(null);
   const formMoveAnimationRef = useRef<Animation | null>(null);
-  const transitionTimersRef = useRef<number[]>([]);
+  const mapRef = useRef<ChengduMapHandle>(null);
   const requestVersionRef = useRef(0);
   const restoreAllowedAtRef = useRef(0);
   const conversationRef = useRef<ConversationMessage[]>([]);
 
   useEffect(() => {
     if (phase !== "ready") return;
-    inputRef.current?.focus();
+    inputRef.current?.focus({ preventScroll: true });
   }, [phase]);
 
   useLayoutEffect(() => {
@@ -250,7 +244,6 @@ export default function PortfolioAgent() {
 
   useEffect(() => () => {
     formMoveAnimationRef.current?.cancel();
-    transitionTimersRef.current.forEach((timer) => window.clearTimeout(timer));
   }, []);
 
   useEffect(() => {
@@ -259,13 +252,7 @@ export default function PortfolioAgent() {
     const restoreMap = () => {
       if (Date.now() < restoreAllowedAtRef.current) return;
       requestVersionRef.current += 1;
-      transitionTimersRef.current.forEach((timer) => window.clearTimeout(timer));
-      setTransitionCovered(false);
       setPhase("restoring");
-      transitionTimersRef.current = [
-        window.setTimeout(() => setTransitionCovered(true), 980),
-        window.setTimeout(() => setPhase("map"), 1620),
-      ];
     };
 
     const handleWheel = (event: WheelEvent) => {
@@ -281,15 +268,12 @@ export default function PortfolioAgent() {
 
   function enterAgent() {
     if (phase !== "map") return;
-    setTransitionCovered(false);
     setPhase("dissolving");
-    transitionTimersRef.current = [
-      window.setTimeout(() => setTransitionCovered(true), 980),
-      window.setTimeout(() => {
-        restoreAllowedAtRef.current = Date.now() + 600;
-        setPhase("ready");
-      }, 1620),
-    ];
+  }
+
+  function completeTransition(active: boolean) {
+    if (active) restoreAllowedAtRef.current = Date.now() + 600;
+    setPhase(active ? "ready" : "map");
   }
 
   async function ask(value: string) {
@@ -335,14 +319,18 @@ export default function PortfolioAgent() {
     void ask(question.trim());
   }
 
-  const mapVisible =
-    phase === "map" ||
-    (phase === "dissolving" && !transitionCovered) ||
-    (phase === "restoring" && transitionCovered);
-
   return (
-    <section className={`${styles.stage} ${styles[phase] ?? ""}`} aria-label="Ask Ender">
-      {mapVisible && (
+    <section className={styles.stage} aria-label="Ask Ender">
+      <PixelSwap
+        className={styles.pixelSwap}
+        aspectRatio="auto"
+        trigger="manual"
+        active={phase !== "map" && phase !== "restoring"}
+        onPrepare={(active) => {
+          if (!active) mapRef.current?.redraw();
+        }}
+        onComplete={completeTransition}
+        firstContent={
         <div
           className={styles.mapEntry}
           role="button"
@@ -353,22 +341,10 @@ export default function PortfolioAgent() {
           onTouchStart={enterAgent}
           aria-label="Ask Ender anything"
         >
-          <ChengduMap />
+          <ChengduMap ref={mapRef} paused={phase !== "map"} />
         </div>
-      )}
-
-      {(phase === "dissolving" || phase === "restoring") && (
-        <div className={`${styles.pixelTransition} ${phase === "restoring" ? styles.pixelTransitionDark : ""}`} aria-hidden="true">
-          {TRANSITION_PIXELS.map((pixel) => (
-            <i key={pixel.id} style={{
-              "--pixel-delay": `${pixel.delay}ms`,
-              "--pixel-exit-delay": `${pixel.exitDelay}ms`,
-            } as React.CSSProperties} />
-          ))}
-        </div>
-      )}
-
-      {!mapVisible && (
+        }
+        secondContent={
         <div className={styles.whiteboard}>
           <div className={`${styles.workspace} ${answer ? styles.hasResponse : ""}`}>
             <div className={styles.responseArea} aria-live="polite">
@@ -430,7 +406,8 @@ export default function PortfolioAgent() {
             </div>
           </div>
         </div>
-      )}
+        }
+      />
     </section>
   );
 }

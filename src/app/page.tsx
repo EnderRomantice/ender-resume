@@ -2,7 +2,9 @@ import Image from "next/image";
 import PageParticleScroll from "@/components/PageParticleScroll/PageParticleScroll";
 import PortfolioAgent from "@/components/PortfolioAgent/PortfolioAgent";
 import GlobalLanyard from "@/components/Lanyard/GlobalLanyard";
-import OpenSourceStack from "@/components/OpenSourceStack/OpenSourceStack";
+import OpenSourceGrid from "@/components/OpenSourceGrid/OpenSourceGrid";
+import githubSnapshot from "@/data/github-portfolio.json";
+import type { GitHubPortfolioData } from "@/lib/github-portfolio-types";
 import styles from "./page.module.css";
 
 const EMAIL = "enderromantic@gmail.com";
@@ -11,6 +13,7 @@ const GITHUB = "https://github.com/EnderRomantice";
 const EXPERIENCE = [
   {
     company: "42",
+    employmentType: "full-time",
     domain: "AI hardware startup · accessibility, pet care & Alzheimer's care",
     role: "Full-Stack Engineer / Lead",
     dates: "Aug 2026 — Present",
@@ -26,8 +29,9 @@ const EXPERIENCE = [
   },
   {
     company: "Creatorone",
+    employmentType: "internship",
     domain: "AI-native TikTok Shop platform",
-    role: "Full-Stack Developer",
+    role: "Full-Stack Developer Intern",
     dates: "Feb 2026 — Jun 2026",
     location: "Seattle · Remote",
     badge: "Recent",
@@ -41,6 +45,7 @@ const EXPERIENCE = [
   },
   {
     company: "XTrace",
+    employmentType: "internship",
     domain: "Silicon Valley AI memory startup",
     role: "Frontend Developer Intern",
     dates: "Dec 2025 — Feb 2026",
@@ -56,50 +61,9 @@ const EXPERIENCE = [
   },
 ];
 
-const OPEN_SOURCE = [
-  {
-    name: "react-bits",
-    rank: "Long-standing Top 2 contributor · 10 merged PRs",
-    desc: "Shipped components, API extensions, rendering improvements, and interaction fixes to a widely used React animation library.",
-    href: "https://github.com/DavidHDev/react-bits",
-    preview: "https://reactbits.dev/",
-    previewImage: "/previews/react-bits.png",
-    stars: "47.3k",
-    contributions: [
-      "Shipped the original Pixel Swap component.",
-      "Extended the Lanyard and InfiniteMenu APIs.",
-      "Reduced unnecessary rendering work in TextPressure, Shuffle, and AnimatedList.",
-      "Diagnosed and fixed TextCursor interaction issues.",
-    ],
-  },
-  {
-    name: "vue-grab",
-    rank: "Author · Maintainer",
-    desc: "Built and maintain a Vue 3 element-grabbing tool that sends component context into AI coding workflows.",
-    href: "https://github.com/EnderRomantice/vue-grab",
-    preview: "https://vue-grab.vercel.app/",
-    previewImage: "/previews/vue-grab.png",
-    stars: "89",
-    contributions: [
-      "Built the project independently from architecture through release.",
-      "Implemented component tracking, Shadow DOM overlays, hotkeys, and agent bridges.",
-      "Own the API design, documentation, releases, and project direction.",
-    ],
-  },
-  {
-    name: "skill-npm",
-    rank: "Contributor · 2 merged PRs",
-    desc: "Improved an npm-based distribution tool for installing Agent Skills across coding agents.",
-    href: "https://github.com/antfu/skills-npm",
-    preview: "https://www.jsdelivr.com/package/npm/skills-npm",
-    previewImage: "/previews/skills-npm.png",
-    stars: "516",
-    contributions: [
-      "Added caching to reduce repeated work and improve perceived performance.",
-      "Added warnings for invalid skills to make failures easier to diagnose.",
-      "Contributed during the project’s formative stage; no longer actively involved in maintenance.",
-    ],
-  },
+const EXPERIENCE_GROUPS = [
+  { id: "full-time", title: "Full-time" },
+  { id: "internship", title: "Internships" },
 ];
 
 const SKILL_GROUPS = [
@@ -163,9 +127,11 @@ export default function Home() {
         <div className={styles.heroLeft}>
           <h1 className={styles.name}>Ender Romantice</h1>
           <p className={styles.lede}>
-            I build <strong>AI-native products</strong> across Next.js, NestJS, and agent workflows,
-            and contribute to open-source React / Vue tools used by other developers. I am a
-            long-standing Top 2 contributor to React Bits.
+            <span className={styles.ledeHighlight}>
+              I build <strong>AI-native products</strong> across Next.js, NestJS, and agent workflows,
+              and contribute to open-source React / Vue tools used by other developers. I am a
+              long-standing Top 2 contributor to React Bits.
+            </span>
           </p>
           <p className={styles.personalNote}>
             Based in Chengdu. Also into rock music, fashion, photography, modeling, coffee, and
@@ -180,35 +146,40 @@ export default function Home() {
 
         <main className={styles.container}>
         {/* Experience */}
-        <section id="experience" className={styles.section}>
+        <section id="experience" className={`${styles.section} ${styles.experienceSection}`}>
           <div className={styles.sectionHead}>
             <h2 className={styles.sectionTitle}>Experience</h2>
           </div>
 
-          {EXPERIENCE.map((job, index) => (
-            <article key={job.company} className={`${styles.role} ${index === 0 ? styles.lanyardRole : ""}`}>
-              {index === 0 && <GlobalLanyard />}
-              <aside className={styles.roleAside}>
-                <div className={`${styles.logoBox} ${job.logoDark ? styles.logoBoxDark : ""}`}>
-                  <Image src={job.logo} alt={`${job.company} logo`} width={30} height={30} />
-                </div>
-                <span className={styles.roleDates}>{job.dates}</span>
-                <span className={styles.roleLocation}>{job.location}</span>
-              </aside>
-              <div className={styles.roleBody}>
-                <h3>{job.role}</h3>
-                <p className={styles.roleCompany}>
-                  {job.company}
-                  {job.badge && <span className={styles.badge}>{job.badge}</span>}
-                </p>
-                <p className={styles.roleDomain}>{job.domain}</p>
-                <ul className={styles.bullets}>
-                  {job.bullets.map((b) => (
-                    <li key={b}>{b}</li>
-                  ))}
-                </ul>
-              </div>
-            </article>
+          {EXPERIENCE_GROUPS.map((group) => (
+            <section key={group.id} className={styles.experienceGroup} aria-labelledby={`experience-${group.id}`}>
+              <h3 id={`experience-${group.id}`} className={styles.experienceGroupTitle}>{group.title}</h3>
+              {EXPERIENCE.filter((job) => job.employmentType === group.id).map((job) => (
+                <article key={job.company} className={`${styles.role} ${job.badge === "Current" ? styles.lanyardRole : ""}`}>
+                  {job.badge === "Current" && <GlobalLanyard role={job.role} company={job.company} />}
+                  <aside className={styles.roleAside}>
+                    <div className={`${styles.logoBox} ${job.logoDark ? styles.logoBoxDark : ""}`}>
+                      <Image src={job.logo} alt={`${job.company} logo`} width={30} height={30} />
+                    </div>
+                    <span className={styles.roleDates}>{job.dates}</span>
+                    <span className={styles.roleLocation}>{job.location}</span>
+                  </aside>
+                  <div className={styles.roleBody}>
+                    <h4 className={styles.roleTitle}>{job.role}</h4>
+                    <p className={styles.roleCompany}>
+                      {job.company}
+                      {job.badge && <span className={styles.badge}>{job.badge}</span>}
+                    </p>
+                    <p className={styles.roleDomain}>{job.domain}</p>
+                    <ul className={styles.bullets}>
+                      {job.bullets.map((b) => (
+                        <li key={b}>{b}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </article>
+              ))}
+            </section>
           ))}
         </section>
 
@@ -218,7 +189,7 @@ export default function Home() {
             <h2 className={styles.sectionTitle}>Open Source</h2>
           </div>
 
-          <OpenSourceStack projects={OPEN_SOURCE} />
+          <OpenSourceGrid initialData={githubSnapshot as GitHubPortfolioData} />
         </section>
 
         {/* Skills */}

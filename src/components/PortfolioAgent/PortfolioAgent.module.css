@@ -21,18 +21,21 @@
   inset: 0;
   overflow: hidden;
   background: #050505;
-  transition: background-color 1100ms ease-in-out;
 }
 
-.stage.ready,
-.stage.thinking,
-.stage.answer { background: #fff; }
+.stage .pixelSwap { position: absolute; inset: 0; width: 100%; height: 100%; }
 
 .mapEntry { position: absolute; inset: 0; width: 100%; border: 0; padding: 0; background: #050505; color: #fff; cursor: pointer; text-align: left; }
 
-.pixelTransition { position: absolute; inset: 0; z-index: 8; display: grid; grid-template-columns: repeat(12,1fr); grid-template-rows: repeat(12,1fr); pointer-events: none; }
-.pixelTransition i { --pixel-delay: 0ms; --pixel-exit-delay: 0ms; min-width: 0; min-height: 0; background: #fff; opacity: 0; transform: scale(.2); filter: blur(2px); will-change: transform,opacity,filter; animation: pixel-cover-in 220ms var(--ease-smooth-out) var(--pixel-delay) forwards, pixel-cover-out 260ms var(--ease-smooth-out) calc(980ms + var(--pixel-exit-delay)) forwards; }
-.pixelTransitionDark i { background: #050505; }
+/* Cloned pixels reveal a stable view of the form. Replaying its entry effects
+   inside every tile would make text disappear or jump at the handoff. */
+.pixelSwap :global(.pixel-swap__grid) :is(.askForm, .inputRule, .answer, .suggestion) {
+  animation: none;
+  transition: none;
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
 
 .whiteboard { position: absolute; inset: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; padding: clamp(28px,5vw,68px); color: #111; background: #fff; }
 .workspace { position: relative; width: min(100%,590px); max-height: 100%; display: grid; gap: 34px; }
@@ -43,12 +46,12 @@
 .askForm { width: 100%; animation: content-in var(--duration-very-slow) var(--ease-smooth-out) 300ms both; }
 .hasResponse .askForm textarea { min-height: 46px; font-size: 18px; }
 .askForm label { display: block; font: 500 clamp(22px,2.7vw,34px)/1.12 var(--font-display), Georgia, serif; color: #171717; }
-.askForm textarea { width: 100%; min-height: 78px; resize: none; border: 0; outline: 0; background: transparent; color: #111; font: 400 clamp(18px,2vw,26px)/1.35 var(--font-display), Georgia, serif; }
+.askForm textarea { width: 100%; min-height: 78px; resize: none; border: 0; outline: 0; background: transparent; color: #111; font: 400 clamp(18px,2vw,26px)/1.35 var(--font-body), Arial, sans-serif; }
 .inputRule { height: 1px; background: #bdbdb8; transform-origin: left; animation: rule-in 700ms var(--ease-smooth-out) 440ms both; }
 .suggestionSpace { min-height: 72px; display: flex; align-items: flex-start; margin-top: 14px; padding-bottom: 18px; }
 .askForm label + .suggestionSpace { height: 132px; box-sizing: border-box; }
 .suggestions { display: flex; flex-flow: row wrap; justify-content: flex-start; align-items: flex-start; column-gap: 10px; row-gap: 12px; }
-.suggestion { flex: 0 0 auto; display: block; max-width: 100%; padding: 7px 11px; border: 1px solid #deded9; border-radius: 999px; background: #fff; color: #686864; font: 12px/1.2 var(--font-display),Georgia,serif; text-align: left; cursor: pointer; opacity: 0; transform: translateY(var(--stagger-distance)); filter: blur(var(--stagger-blur)); animation: suggestion-in 850ms var(--stagger-ease) forwards; transition: border-color var(--duration-quick,150ms) ease, color var(--duration-quick,150ms) ease; will-change: transform,opacity,filter; }
+.suggestion { flex: 0 0 auto; display: block; max-width: 100%; padding: 7px 11px; border: 1px solid #deded9; border-radius: 999px; background: #fff; color: #686864; font: 12px/1.2 var(--font-body),Arial,sans-serif; text-align: left; cursor: pointer; opacity: 0; transform: translateY(var(--stagger-distance)); filter: blur(var(--stagger-blur)); animation: suggestion-in 850ms var(--stagger-ease) forwards; transition: border-color var(--duration-quick,150ms) ease, color var(--duration-quick,150ms) ease; will-change: transform,opacity,filter; }
 .suggestion2 { animation-delay: 90ms; }
 .suggestion3 { animation-delay: 180ms; }
 .suggestion:hover { border-color: #999994; color: #111; }
@@ -69,7 +72,7 @@
 .answer { width: 100%; height: 100%; min-height: 0; padding: 0; transform: translateY(0); opacity: 1; transition: transform var(--text-swap-dur) var(--text-swap-ease), opacity var(--text-swap-dur) var(--text-swap-ease); will-change: transform,opacity; }
 .answerExit { transform: translateY(calc(var(--text-swap-translate-y) * -1)); opacity: .18; }
 .answerEnter { animation: answer-enter var(--text-swap-dur) var(--text-swap-ease) both; }
-.markdown { max-height:100%; color:#202020; font:400 var(--answer-size)/1.6 var(--font-display),Georgia,serif; overflow:hidden; overflow-wrap:anywhere; transition: font-size var(--duration-very-slow) var(--ease-smooth-out); will-change:font-size; }
+.markdown { max-height:100%; color:#202020; font:400 var(--answer-size)/1.6 var(--font-body),Arial,sans-serif; overflow:hidden; overflow-wrap:anywhere; transition: font-size var(--duration-very-slow) var(--ease-smooth-out); will-change:font-size; }
 .markdown > :first-child { margin-top:0; }
 .markdown > :last-child { margin-bottom:0; }
 .markdown p,.markdown ul,.markdown ol,.markdown blockquote,.markdown pre,.markdown table { margin:0 0 .8em; }
@@ -86,8 +89,6 @@
 .markdown th,.markdown td { padding:.35em .5em; border:1px solid #d7d7d2; text-align:left; }
 .markdown hr { margin:.9em 0; border:0; border-top:1px solid #ccc; }
 
-@keyframes pixel-cover-in { to { opacity: 1; transform: scale(1.03); filter: blur(0); } }
-@keyframes pixel-cover-out { from { opacity: 1; transform: scale(1.03); filter: blur(0); } to { opacity: 0; transform: scale(.15); filter: blur(2px); } }
 @keyframes content-in { from { opacity: 0; filter: blur(3px); transform: translateY(12px); } to { opacity: 1; filter: blur(0); transform: translateY(0); } }
 @keyframes rule-in { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 @keyframes pixel-on { 0%,100% { opacity: .15; transform: scale(1); } 45% { opacity: 1; transform: scale(1.18); } }
@@ -96,4 +97,4 @@
 @keyframes suggestion-in { to { opacity: 1; transform: translateY(0); filter: blur(0); } }
 
 @media (max-width: 860px) { .stage { position: relative; min-height: 520px; } .whiteboard { padding: 34px 28px; } }
-@media (prefers-reduced-motion: reduce) { .stage,.mapEntry,.whiteboard,.askForm,.inputRule,.answer,.suggestion,.markdown { animation-duration: 1ms !important; animation-delay: 0ms !important; transition-duration: 1ms !important; } .pixelTransition i { animation-duration: 1ms,1ms !important; animation-delay: 0ms,2ms !important; } .pixelGrid i,.shimmerLabel::before { animation: none !important; } }
+@media (prefers-reduced-motion: reduce) { .stage,.mapEntry,.whiteboard,.askForm,.inputRule,.answer,.suggestion,.markdown { animation-duration: 1ms !important; animation-delay: 0ms !important; transition-duration: 1ms !important; } .pixelGrid i,.shimmerLabel::before { animation: none !important; } }

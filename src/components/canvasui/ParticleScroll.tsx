@@ -782,6 +782,10 @@ export function ParticleScroll({
   });
 
   useEffect(() => {
+    // The DOM fallback already scrolls natively. Intercepting its wheel events
+    // ties scrolling to canvas capture and other work on the main thread.
+    if (!native) return;
+
     const root = rootRef.current;
     const content = contentRef.current;
     if (!root || !content) return;

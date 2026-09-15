@@ -1,0 +1,123 @@
+.portfolio {
+  width: 100%;
+  min-width: 0;
+}
+
+.overview,
+.gridFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.overview {
+  --underline-reveal-duration: 250ms;
+  --underline-reset-duration: 150ms;
+  margin-bottom: 18px;
+}
+.overview a { display: inline-flex; align-items: baseline; gap: 4px; color: var(--ink); font-size: 14px; text-decoration: none; }
+.profileName { position: relative; }
+.profileName::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -3px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform var(--underline-reset-duration) ease-out;
+}
+.overview a:hover .profileName::after,
+.overview a:focus-visible .profileName::after {
+  transform: scaleX(1);
+  transition-duration: var(--underline-reveal-duration);
+  transition-timing-function: ease-in-out;
+}
+.profileArrow { color: var(--muted); }
+
+.projectViewport {
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #b7b7b7 transparent;
+  padding: 3px 3px 10px;
+  margin: -3px;
+  width: calc(100% + 6px);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(178px, 1fr));
+  gap: 12px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.grid li { min-width: 0; }
+
+.project {
+  --card-feedback-duration: 150ms;
+  --card-press-duration: 80ms;
+  display: flex;
+  flex-direction: column;
+  height: 204px;
+  padding: 17px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--bg);
+  transition: transform var(--card-feedback-duration) ease-out,
+    background-color var(--card-feedback-duration) ease-out,
+    border-color var(--card-feedback-duration) ease-out;
+}
+
+.project:hover,
+.project:focus-visible {
+  border-color: #c8c8c8;
+  background-color: #fafafa;
+  transform: translateY(-1px);
+}
+.project:active {
+  transform: translateY(0) scale(0.995);
+  transition-duration: var(--card-press-duration);
+}
+.project:focus-visible,
+.projectViewport:focus-visible,
+.overview a:focus-visible,
+.rankingNote summary:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+.cardTop { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: #505050; margin-bottom: 15px; }
+.arrow { font-size: 14px; line-height: 1; color: #999; }
+.identity { min-width: 0; }
+.owner { display: block; color: #808080; font-size: 10px; line-height: 1.4; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.name { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font: 600 21px/1.2 var(--font-display), Georgia, serif; color: var(--ink); }
+.description { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; color: var(--muted); font-size: 12px; line-height: 1.4; margin-top: 9px; }
+.stats { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; padding-top: 14px; font-size: 11px; font-variant-numeric: tabular-nums; }
+.stats > span { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+.statLabel { color: #808080; }
+.gridFooter { margin-top: 7px; margin-bottom: 34px; font-size: 11px; }
+.rankingNote { position: relative; text-align: right; max-width: 410px; }
+.rankingNote summary { cursor: pointer; text-decoration: underline; text-decoration-color: #ccc; text-underline-offset: 3px; }
+.rankingNote p { margin-top: 9px; text-align: left; line-height: 1.6; color: var(--muted); }
+
+@media (prefers-reduced-motion: reduce) {
+  .profileName::after { transition: none; }
+  .project { transition: none; }
+  .project:hover,
+  .project:focus-visible,
+  .project:active { transform: none; }
+}
+
+@media (max-width: 560px) {
+  .overview { flex-wrap: wrap; row-gap: 4px; }
+  .overview > span { font-size: 10px; }
+  .grid { gap: 10px; }
+  .gridFooter { flex-direction: column; gap: 6px; }
+  .rankingNote { text-align: left; }
+}

@@ -14,6 +14,7 @@ import {
 } from '@react-three/rapier';
 import { MeshLineGeometry, MeshLineMaterial } from 'meshline';
 import * as THREE from 'three';
+import { createProfileCard, type CardProfile } from './profileCard';
 
 import './Lanyard.css';
 
@@ -45,6 +46,7 @@ interface LanyardProps {
   fov?: number;
   transparent?: boolean;
   frontImage?: string | null;
+  frontProfile?: CardProfile;
   backImage?: string | null;
   imageFit?: 'cover' | 'contain';
   lanyardImage?: string | null;
@@ -58,6 +60,7 @@ interface LanyardProps {
   swayOnScroll?: boolean;
   onPull?: () => void;
   passThrough?: boolean;
+  paused?: boolean;
 }
 
 export default function Lanyard({
@@ -66,6 +69,7 @@ export default function Lanyard({
   fov = 20,
   transparent = true,
   frontImage = null,
+  frontProfile,
   backImage = null,
   imageFit = 'cover',
   lanyardImage = null,
@@ -78,7 +82,8 @@ export default function Lanyard({
   interactive = true,
   swayOnScroll = false,
   onPull,
-  passThrough = false
+  passThrough = false,
+  paused = false
 }: LanyardProps) {
   const [isMobile, setIsMobile] = useState<boolean>(() => typeof window !== 'undefined' && window.innerWidth < 768);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -120,8 +125,9 @@ export default function Lanyard({
   }, [passThrough]);
 
   return (
-    <div className="lanyard-wrapper">
+    <div className="lanyard-wrapper" data-paused={paused}>
       <Canvas
+        frameloop={paused ? 'demand' : 'always'}
         camera={{ position, fov }}
         dpr={[1, isMobile ? 1.5 : 2]}
         gl={{ alpha: transparent }}
@@ -137,10 +143,12 @@ export default function Lanyard({
       >
         <ambientLight intensity={Math.PI} />
         <Suspense fallback={null}>
-          <Physics gravity={gravity} timeStep={isMobile ? 1 / 30 : 1 / 60}>
+          <Physics gravity={gravity} timeStep={isMobile ? 1 / 30 : 1 / 60} paused={paused}>
             <Band
+            paused={paused}
             isMobile={isMobile}
             frontImage={frontImage}
+            frontProfile={frontProfile}
             backImage={backImage}
             imageFit={imageFit}
             lanyardImage={lanyardImage}
@@ -193,10 +201,12 @@ export default function Lanyard({
 }
 
 interface BandProps {
+  paused?: boolean;
   maxSpeed?: number;
   minSpeed?: number;
   isMobile?: boolean;
   frontImage?: string | null;
+  frontProfile?: CardProfile;
   backImage?: string | null;
   imageFit?: 'cover' | 'contain';
   lanyardImage?: string | null;
@@ -250,10 +260,12 @@ function RingJoint({
 }
 
 function Band({
+  paused = false,
   maxSpeed = 50,
   minSpeed = 0,
   isMobile = false,
   frontImage = null,
+  frontProfile,
   backImage = null,
   imageFit = 'cover',
   lanyardImage = null,
@@ -296,14 +308,19 @@ function Band({
   const texture = useTexture(lanyardImage || LANYARD_TEXTURE);
   // useTexture must be called unconditionally; use a blank pixel when no image
   // is provided for a given face, and skip compositing it below.
-  const frontTex = useTexture(frontImage || BLANK_PIXEL);
+  const frontTex = useTexture(frontProfile?.avatar || frontImage || BLANK_PIXEL);
   const backTex = useTexture(backImage || BLANK_PIXEL);
+  const profileName = frontProfile?.name;
+  const profileRole = frontProfile?.role;
+  const profileCompany = frontProfile?.company;
+  const profileFontFamily = frontProfile?.fontFamily;
+  const profileNameFontFamily = frontProfile?.nameFontFamily;
 
   // Composite the front/back images into the card's texture atlas (front = left
   // half, back = right half). Each image is drawn aspect-preserving (no stretch).
   const cardMap = useMemo(() => {
     const baseMap = materials.base.map as THREE.Texture;
-    if (!frontImage && !backImage) return baseMap;
+    if (profileName === undefined && !frontImage && !backImage) return baseMap;
 
     const baseImg = baseMap.image as any;
     const W = baseImg.width;
@@ -359,7 +376,18 @@ function Band({
       }
     };
 
-    if (frontImage && frontTex.image) drawFitted(frontTex.image, FRONT_UV_RECT);
+    if (profileName !== undefined && profileRole !== undefined && profileCompany !== undefined && frontTex.image) {
+      const profileCard = createProfileCard(frontTex.image as HTMLImageElement, {
+        name: profileName,
+        role: profileRole,
+        company: profileCompany,
+        fontFamily: profileFontFamily,
+        nameFontFamily: profileNameFontFamily,
+      });
+      if (profileCard) drawFitted(profileCard, FRONT_UV_RECT);
+    } else if (frontImage && frontTex.image) {
+      drawFitted(frontTex.image, FRONT_UV_RECT);
+    }
     if (backImage && backTex.image) {
       // The back logo is centred and scaled down so it reads as a small badge
       // mark rather than filling (and clashing with) the whole card face.
@@ -372,7 +400,11 @@ function Band({
     composite.anisotropy = 16;
     composite.needsUpdate = true;
     return composite;
-  }, [frontImage, backImage, imageFit, frontTex, backTex, materials.base.map]);
+  }, [frontImage, backImage, imageFit, frontTex, backTex, materials.base.map, profileName, profileRole, profileCompany, profileFontFamily, profileNameFontFamily]);
+
+  useEffect(() => () => {
+    if (cardMap !== materials.base.map) cardMap.dispose();
+  }, [cardMap, materials.base.map]);
 
   // Build the lanyard strap texture. When a custom band image is supplied we
   // colour-invert it (black-on-transparent logo -> white) and composite it,
@@ -495,7 +527,10 @@ function Band({
   }, [hovered, dragged]);
 
   useEffect(() => {
-    if (!swayOnScroll) return;
+    if (!swayOnScroll || paused) {
+      scrollKick.current = 0;
+      return;
+    }
 
     let previousY: number | null = null;
     const handleScroll = (event: Event) => {
@@ -518,9 +553,10 @@ function Band({
 
     document.addEventListener('scroll', handleScroll, { capture: true, passive: true });
     return () => document.removeEventListener('scroll', handleScroll, { capture: true });
-  }, [swayOnScroll]);
+  }, [swayOnScroll, paused]);
 
   useFrame((state, delta) => {
+    if (paused) return;
     if (swayOnScroll && card.current && Math.abs(scrollKick.current) > 0.0001) {
       card.current.wakeUp();
       card.current.applyTorqueImpulse({ x: 0, y: 0, z: scrollKick.current }, true);

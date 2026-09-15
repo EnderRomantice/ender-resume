@@ -1,0 +1,140 @@
+.heatmap {
+  --heatmap-reveal-duration: 250ms;
+  --heatmap-reveal-stagger: 15ms;
+  --heatmap-reveal-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-body), sans-serif;
+}
+
+.caption {
+  margin-bottom: 20px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.caption strong {
+  color: var(--ink);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.scroll {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #c8c8c8 transparent;
+}
+
+.scroll:focus-visible {
+  outline: 1px solid var(--ink);
+  outline-offset: 5px;
+}
+
+.graph {
+  display: block;
+  width: 100%;
+  min-width: 740px;
+  height: auto;
+}
+
+.axis {
+  fill: var(--muted);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 10px;
+}
+
+.cell,
+.swatch {
+  --cell-color: #eeeeee;
+  fill: var(--cell-color);
+  background: var(--cell-color);
+}
+
+.cell[data-level='FIRST_QUARTILE'],
+.swatch[data-level='FIRST_QUARTILE'] {
+  --cell-color: #c6c6c6;
+}
+
+.cell[data-level='SECOND_QUARTILE'],
+.swatch[data-level='SECOND_QUARTILE'] {
+  --cell-color: #929292;
+}
+
+.cell[data-level='THIRD_QUARTILE'],
+.swatch[data-level='THIRD_QUARTILE'] {
+  --cell-color: #5a5a5a;
+}
+
+.cell[data-level='FOURTH_QUARTILE'],
+.swatch[data-level='FOURTH_QUARTILE'] {
+  --cell-color: #171717;
+}
+
+.week {
+  opacity: 1;
+}
+
+.heatmap[data-reveal='pending'] .week {
+  opacity: 0;
+}
+
+.heatmap[data-reveal='shown'] .week {
+  animation: reveal-week var(--heatmap-reveal-duration) var(--heatmap-reveal-ease) calc(var(--week-index) * var(--heatmap-reveal-stagger)) both;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  margin-top: 14px;
+  color: var(--muted);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.legend span:first-child {
+  margin-right: 4px;
+}
+
+.legend span:last-child {
+  margin-left: 4px;
+}
+
+.swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 1.5px;
+}
+
+.empty {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+@keyframes reveal-week {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .heatmap[data-reveal] .week {
+    animation: none;
+    opacity: 1;
+  }
+}
