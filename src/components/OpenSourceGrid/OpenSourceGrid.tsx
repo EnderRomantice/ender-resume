@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useId, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useRef, useState, type CSSProperties } from 'react';
 import type { GitHubPortfolioData } from '@/lib/github-portfolio-types';
 import { isGitHubPortfolioData } from '@/lib/github-portfolio-validation';
 import { rankGitHubProjects } from '@/lib/github-ranking';
@@ -20,6 +20,7 @@ const StarIcon = <svg width="13" height="13" viewBox="0 0 24 24" fill="none" str
 export default function OpenSourceGrid({ initialData }: { initialData: GitHubPortfolioData }) {
   const [data, setData] = useState(initialData);
   const [rankingOpen, setRankingOpen] = useState(false);
+  const projectViewportRef = useRef<HTMLDivElement>(null);
   const rankingPanelId = useId();
   const ranked = useMemo(() => rankGitHubProjects(data.repositories.filter((project) =>
     project.stars >= 50 &&
@@ -42,6 +43,67 @@ export default function OpenSourceGrid({ initialData }: { initialData: GitHubPor
     return () => controller.abort();
   }, [initialData.username, initialData.updatedAt]);
 
+  useEffect(() => {
+    const viewport = projectViewportRef.current;
+    if (!viewport || projects.length === 0 || viewport.dataset.entry === 'complete') return;
+
+    // A refreshed project count should settle an entrance already in progress.
+    if (viewport.dataset.entry === 'shown') {
+      viewport.dataset.entry = 'complete';
+      return;
+    }
+
+    const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (motion.matches || typeof IntersectionObserver === 'undefined') {
+      viewport.dataset.entry = 'complete';
+      return;
+    }
+
+    // Keep server-rendered cards visible. Only prepare cards that are still
+    // offscreen, so hydration never hides content already being read.
+    if (!viewport.dataset.entry) {
+      const rect = viewport.getBoundingClientRect();
+      if (rect.top < window.innerHeight && rect.bottom > 0) {
+        viewport.dataset.entry = 'complete';
+        return;
+      }
+      viewport.dataset.entry = 'pending';
+    }
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting || entry.intersectionRatio < 0.12 || viewport.dataset.entry !== 'pending') return;
+      viewport.dataset.entry = 'shown';
+      observer.disconnect();
+    }, { threshold: 0.12 });
+
+    const complete = () => {
+      viewport.dataset.entry = 'complete';
+      observer.disconnect();
+    };
+    const finish = (event: AnimationEvent) => {
+      if (viewport.dataset.entry !== 'shown' ||
+        !(event.target instanceof HTMLLIElement) || event.target.dataset.entryEnd !== 'true') return;
+      complete();
+    };
+    const reduceMotion = () => {
+      if (motion.matches) complete();
+    };
+
+    if (viewport.dataset.entry === 'pending') observer.observe(viewport);
+    viewport.addEventListener('animationend', finish);
+    // Keyboard navigation must reveal a card before focus can land on it.
+    viewport.addEventListener('focusin', complete);
+    motion.addEventListener('change', reduceMotion);
+
+    return () => {
+      observer.disconnect();
+      viewport.removeEventListener('animationend', finish);
+      viewport.removeEventListener('focusin', complete);
+      motion.removeEventListener('change', reduceMotion);
+      // Preserve the phase across Strict Mode and project-count changes.
+    };
+  }, [projects.length]);
+
   return (
     <div className={styles.portfolio}>
       <div className={styles.overview}>
@@ -55,10 +117,15 @@ export default function OpenSourceGrid({ initialData }: { initialData: GitHubPor
         </span>
       </div>
 
-      <div className={styles.projectViewport} role="region" aria-label="Contributed projects, sorted by contributor rank and stars" tabIndex={0}>
+      <div ref={projectViewportRef} className={styles.projectViewport} role="region" aria-label="Contributed projects, sorted by contributor rank and stars" tabIndex={0}>
         <ol className={styles.grid}>
-          {projects.map((project) => (
-            <li key={project.id}>
+          {projects.map((project, index) => (
+            <li
+              key={project.id}
+              className={styles.projectEntry}
+              style={{ '--project-index': index } as CSSProperties}
+              data-entry-end={index === projects.length - 1 ? 'true' : undefined}
+            >
               <a className={styles.project} href={project.url} target="_blank" rel="noreferrer" aria-label={`${project.fullName} on GitHub`}>
                 <div className={styles.identity}>
                   <div className={styles.identityText}>

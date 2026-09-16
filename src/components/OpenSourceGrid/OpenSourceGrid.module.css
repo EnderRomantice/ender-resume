@@ -44,6 +44,9 @@
 .updated svg { flex-shrink: 0; }
 
 .projectViewport {
+  --card-enter-duration: 360ms;
+  --card-enter-stagger: 30ms;
+  --card-enter-ease: cubic-bezier(0.22, 1, 0.36, 1);
   min-width: 0;
   overflow-x: auto;
   scrollbar-width: thin;
@@ -62,7 +65,36 @@
   padding: 0;
 }
 
-.grid li { min-width: 0; }
+.projectEntry {
+  min-width: 0;
+  transform-origin: center;
+}
+
+/* Animate the wrapper so the link's hover feedback stays independent. */
+.projectViewport[data-entry='pending'] .projectEntry {
+  opacity: 0;
+  transform: translateY(6px) scale(0.94) rotate(-1.5deg);
+}
+
+.projectViewport[data-entry='shown'] .projectEntry {
+  animation: card-enter var(--card-enter-duration) var(--card-enter-ease) calc(var(--project-index) * var(--card-enter-stagger)) both;
+}
+
+@keyframes card-enter {
+  0% {
+    opacity: 0;
+    transform: translateY(6px) scale(0.94) rotate(-1.5deg);
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(0) scale(1.012) rotate(0.25deg);
+    animation-timing-function: ease-in-out;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(0);
+  }
+}
 
 .project {
   --card-feedback-duration: 150ms;
@@ -172,6 +204,11 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .projectViewport[data-entry] .projectEntry {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
   .t-acc-panel, .t-acc-panel-inner, .t-acc-chevron {
     transition: none !important;
   }
