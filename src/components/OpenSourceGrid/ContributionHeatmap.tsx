@@ -65,7 +65,7 @@ export default function ContributionHeatmap({ calendar }: { calendar: GitHubCale
     observer.observe(figure);
 
     const finish = (event: AnimationEvent) => {
-      if (!(event.target instanceof SVGElement) || event.target.dataset.lastWeek !== 'true') return;
+      if (!(event.target instanceof SVGElement) || event.target.dataset.revealEnd !== 'true') return;
       // Release the finished animations instead of retaining composited layers.
       figure.dataset.reveal = 'complete';
     };
@@ -116,23 +116,30 @@ export default function ContributionHeatmap({ calendar }: { calendar: GitHubCale
               {weeks.map((days, index) => (
                 <g
                   key={days[0].date}
-                  className={styles.week}
                   style={{ '--week-index': index } as CSSProperties}
-                  data-last-week={index === weeks.length - 1 ? 'true' : undefined}
                 >
                   {days.map(day => (
-                    <rect
-                      key={day.date}
-                      className={styles.cell}
-                      data-level={day.contributionLevel}
-                      x={LEFT_LABEL_WIDTH + index * CELL_STEP}
-                      y={TOP_LABEL_HEIGHT + day.weekday * CELL_STEP}
-                      width={CELL_SIZE}
-                      height={CELL_SIZE}
-                      rx={1.5}
-                    >
+                    <g key={day.date}>
                       <title>{`${day.contributionCount.toLocaleString('en-US')} ${day.contributionCount === 1 ? 'contribution' : 'contributions'} on ${dateLabel.format(asDate(day.date))}`}</title>
-                    </rect>
+                      <rect
+                        className={styles.cellBase}
+                        x={LEFT_LABEL_WIDTH + index * CELL_STEP}
+                        y={TOP_LABEL_HEIGHT + day.weekday * CELL_STEP}
+                        width={CELL_SIZE}
+                        height={CELL_SIZE}
+                        rx={1.5}
+                      />
+                      <rect
+                        className={styles.cell}
+                        data-level={day.contributionLevel}
+                        data-reveal-end={day === lastDay ? 'true' : undefined}
+                        x={LEFT_LABEL_WIDTH + index * CELL_STEP}
+                        y={TOP_LABEL_HEIGHT + day.weekday * CELL_STEP}
+                        width={CELL_SIZE}
+                        height={CELL_SIZE}
+                        rx={1.5}
+                      />
+                    </g>
                   ))}
                 </g>
               ))}

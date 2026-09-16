@@ -1,7 +1,7 @@
 .heatmap {
-  --heatmap-reveal-duration: 250ms;
-  --heatmap-reveal-stagger: 15ms;
-  --heatmap-reveal-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --heatmap-reveal-duration: 500ms;
+  --heatmap-reveal-stagger: 12ms;
+  --heatmap-reveal-ease: ease-in-out;
   width: 100%;
   min-width: 0;
   margin: 0;
@@ -56,6 +56,15 @@
   background: var(--cell-color);
 }
 
+.cellBase {
+  fill: #eeeeee;
+}
+
+.cell {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
 .cell[data-level='FIRST_QUARTILE'],
 .swatch[data-level='FIRST_QUARTILE'] {
   --cell-color: #c6c6c6;
@@ -76,16 +85,12 @@
   --cell-color: #171717;
 }
 
-.week {
-  opacity: 1;
+.heatmap[data-reveal='pending'] .cell {
+  transform: scale(0);
 }
 
-.heatmap[data-reveal='pending'] .week {
-  opacity: 0;
-}
-
-.heatmap[data-reveal='shown'] .week {
-  animation: reveal-week var(--heatmap-reveal-duration) var(--heatmap-reveal-ease) calc(var(--week-index) * var(--heatmap-reveal-stagger)) both;
+.heatmap[data-reveal='shown'] .cell {
+  animation: grow-cell var(--heatmap-reveal-duration) var(--heatmap-reveal-ease) calc(var(--week-index) * var(--heatmap-reveal-stagger)) both;
 }
 
 .footer {
@@ -127,14 +132,14 @@
   font-size: 13px;
 }
 
-@keyframes reveal-week {
-  from { opacity: 0; }
-  to { opacity: 1; }
+@keyframes grow-cell {
+  from { transform: scale(0); }
+  to { transform: scale(1); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .heatmap[data-reveal] .week {
+  .heatmap[data-reveal] .cell {
     animation: none;
-    opacity: 1;
+    transform: none;
   }
 }
