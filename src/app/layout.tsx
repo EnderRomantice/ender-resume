@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist_Mono } from "next/font/google";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./globals.css";
-import GlobalLoadingScreen from "@/components/LoadingScreen/GlobalLoadingScreen";
 import { cormorant, greatVibes, instrumentSans } from "./fonts";
 
 const geistMono = Geist_Mono({
@@ -25,7 +24,6 @@ export default function RootLayout({
     <html lang="en" className={`${instrumentSans.variable} ${cormorant.variable} ${greatVibes.variable} ${geistMono.variable}`}>
       <body>
         {children}
-        <GlobalLoadingScreen />
       </body>
     </html>
   );
