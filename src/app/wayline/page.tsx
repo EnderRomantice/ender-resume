@@ -35,7 +35,7 @@ const engagement = [
   ["Deliver", "Build, observe, decide", "Deliver the workflow, monitor real use, then expand, refine, or stop."],
 ];
 
-const contact = "mailto:ender@singlebase.co?subject=Wayline%20discovery%20call";
+const contact = "mailto:enderromantice@gmail.com?subject=Wayline%20discovery%20call";
 
 export default function WaylinePage() {
   return (
@@ -102,7 +102,7 @@ export default function WaylinePage() {
             <div><h3>Engagement model</h3><p>Scoped paid pilot, followed by implementation and support where results justify it.</p><h3>Availability</h3><p>Client conversations and support during normal US business hours.</p></div>
           </div>
           <div className={styles.contact} id="contact">
-            <div><p className={styles.eyebrow}>Let’s make one workflow measurably better.</p><a className={styles.email} href="mailto:ender@singlebase.co">ender@singlebase.co</a></div>
+            <div><p className={styles.eyebrow}>Let’s make one workflow measurably better.</p><a className={styles.email} href="mailto:enderromantice@gmail.com">enderromantice@gmail.com</a></div>
             <a className={styles.contactButton} href={contact}>Discuss a pilot <span aria-hidden="true">↗</span></a>
           </div>
         </section>
