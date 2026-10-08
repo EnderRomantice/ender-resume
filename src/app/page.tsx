@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 import GlobalLoadingScreen from "@/components/LoadingScreen/GlobalLoadingScreen";
 import PageParticleScroll from "@/components/PageParticleScroll/PageParticleScroll";
 import PortfolioAgent from "@/components/PortfolioAgent/PortfolioAgent";
@@ -150,11 +149,11 @@ export default function Home() {
           <div className={styles.sectionHead}>
             <h2 id="project-plan-title" className={styles.sectionTitle}>Project / Plan</h2>
           </div>
-          <Link href="/wayline" className={styles.waylineEntry}>
+          <a href="https://wayline-teal.vercel.app" className={styles.waylineEntry}>
             <h3 className={styles.waylineBrand}>WAYLINE</h3>
             <span className={styles.waylineDescription}>Operational workflow systems. From fragmented inputs to completed work.</span>
             <span className={styles.waylineAction}>Explore Wayline <span aria-hidden="true">↗</span></span>
-          </Link>
+          </a>
         </section>
         {/* Experience */}
         <section id="experience" className={`${styles.section} ${styles.experienceSection}`}>
