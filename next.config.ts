@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/wayline",
-        destination: "https://wayline-teal.vercel.app",
+        destination: "https://wayline.studio/",
         permanent: true,
       },
     ];
