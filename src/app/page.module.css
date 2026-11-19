@@ -257,7 +257,7 @@
 .roleLocation {
   font-family: var(--font-geist-mono), monospace;
   font-size: 12px;
-  color: #9a9a9a;
+  color: var(--muted);
   letter-spacing: 0.01em;
 }
 
@@ -273,6 +273,23 @@
   font-size: 15px;
   color: var(--ink);
   margin-bottom: 7px;
+}
+
+.companyLink {
+  text-decoration: underline;
+  text-decoration-color: var(--line);
+  text-underline-offset: 4px;
+  transition: text-decoration-color 0.15s ease;
+}
+
+.companyLink:hover {
+  text-decoration-color: var(--ink);
+}
+
+.companyLink:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+  border-radius: 2px;
 }
 
 .roleDomain {
@@ -397,48 +414,6 @@
 }
 
 /* ---------- Responsive ---------- */
-.waylineEntry {
-  display: flex;
-  align-items: center;
-  gap: 28px;
-  padding: 28px 0;
-  border-top: 1px solid var(--line);
-}
-
-.waylineBrand {
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  font-size: 13px;
-}
-
-.waylineDescription {
-  flex: 1;
-  font-size: 14px;
-  line-height: 1.5;
-  color: var(--muted);
-}
-
-.waylineAction {
-  font-size: 13px;
-  white-space: nowrap;
-}
-
-.waylineEntry:hover .waylineAction {
-  text-decoration: underline;
-  text-underline-offset: 4px;
-}
-
-.waylineEntry:focus-visible {
-  outline: 2px solid var(--ink);
-  outline-offset: 5px;
-}
-
-@media (max-width: 560px) {
-  .waylineEntry { flex-wrap: wrap; gap: 12px; }
-  .waylineDescription { flex-basis: 100%; order: 3; }
-  .waylineAction { margin-left: auto; }
-}
-
 @media (max-width: 860px) {
   .shell {
     --hero-gutter: 32px;
@@ -474,8 +449,14 @@
 
   .roleAside {
     flex-direction: row;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 16px;
+    gap: 6px 16px;
+  }
+
+  .roleDates,
+  .roleLocation {
+    white-space: nowrap;
   }
 
   .skillGroups {

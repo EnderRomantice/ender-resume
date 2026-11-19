@@ -10,16 +10,49 @@ import styles from "./page.module.css";
 const EMAIL = "enderromantic@gmail.com";
 const GITHUB = "https://github.com/EnderRomantice";
 
-const EXPERIENCE = [
+const EXPERIENCE: {
+  company: string;
+  employmentType: string;
+  domain: string;
+  role: string;
+  dates: string;
+  location: string;
+  badge: string | null;
+  logo: string;
+  logoDark: boolean;
+  logoBackground?: string;
+  href?: string;
+  bullets: string[];
+}[] = [
+  {
+    company: "Wayline",
+    employmentType: "founder",
+    domain: "Operational workflow systems · agent-delivered work",
+    role: "Co-founder",
+    dates: "Nov 2026 — Present",
+    location: "Chengdu · Remote",
+    badge: "Current",
+    logo: "/logos/wayline.svg",
+    logoDark: false,
+    logoBackground: "#2F6487",
+    href: "https://wayline.studio/",
+    bullets: [
+      "Lead customer acquisition: sourcing prospects, running discovery calls, and scoping each engagement around one workflow with clear acceptance criteria.",
+      "Own the technical architecture across client delivery systems, internal tooling, and the agent stack that turns fragmented inputs into completed work.",
+      "Built Wayline's in-house admin backend for managing clients, engagements, and delivery status.",
+      "Develop the agent delivery workflow used to execute, verify, and hand off client work with traceable evidence.",
+    ],
+  },
   {
     company: "42",
     employmentType: "full-time",
     domain: "AI hardware startup · accessibility, pet care & Alzheimer's care",
     role: "Full-Stack Engineer / Lead",
-    dates: "Aug 2026 — Present",
+    dates: "Aug 2026 — Nov 2026",
     location: "Beijing · Remote",
-    badge: "Current",
+    badge: null,
     logo: "/logos/42-ai.png",
+    href: "https://www.42spartans.com/",
     logoDark: true,
     bullets: [
       "Designed and built a desktop multi-agent workbench that separates conversation, planning, and tool execution. Parallel background tasks, mid-task instructions, and result reporting keep long-running work from blocking user interaction; delivered macOS and Windows alpha test builds.",
@@ -36,6 +69,7 @@ const EXPERIENCE = [
     location: "Seattle · Remote",
     badge: "Recent",
     logo: "/logos/creatorone.svg",
+    href: "https://www.creator1.com",
     logoDark: false,
     bullets: [
       "Contributed to the platform from the ground up across Next.js dashboards, NestJS APIs, authentication and authorization, API contracts, relational data models, and AI agent workflows.",
@@ -52,6 +86,7 @@ const EXPERIENCE = [
     location: "San Francisco · Remote",
     badge: null,
     logo: "/logos/xtrace.png",
+    href: "https://xtrace.ai/",
     logoDark: true,
     bullets: [
       "Contributed to the Web Memory Hub and browser-extension interfaces, helping users manage and reuse memory across web-based AI agents.",
@@ -62,6 +97,7 @@ const EXPERIENCE = [
 ];
 
 const EXPERIENCE_GROUPS = [
+  { id: "founder", title: "Founder" },
   { id: "full-time", title: "Full-time" },
   { id: "internship", title: "Internships" },
 ];
@@ -145,16 +181,6 @@ export default function Home() {
         </header>
 
         <main className={styles.container}>
-        <section id="project-plan" className={styles.section} aria-labelledby="project-plan-title">
-          <div className={styles.sectionHead}>
-            <h2 id="project-plan-title" className={styles.sectionTitle}>Project / Plan</h2>
-          </div>
-          <a href="https://wayline-teal.vercel.app" className={styles.waylineEntry}>
-            <h3 className={styles.waylineBrand}>WAYLINE</h3>
-            <span className={styles.waylineDescription}>Operational workflow systems. From fragmented inputs to completed work.</span>
-            <span className={styles.waylineAction}>Explore Wayline <span aria-hidden="true">↗</span></span>
-          </a>
-        </section>
         {/* Experience */}
         <section id="experience" className={`${styles.section} ${styles.experienceSection}`}>
           <div className={styles.sectionHead}>
@@ -167,7 +193,10 @@ export default function Home() {
               {EXPERIENCE.filter((job) => job.employmentType === group.id).map((job) => (
                 <article key={job.company} className={styles.role}>
                   <aside className={styles.roleAside}>
-                    <div className={`${styles.logoBox} ${job.logoDark ? styles.logoBoxDark : ""}`}>
+                    <div
+                      className={`${styles.logoBox} ${job.logoDark ? styles.logoBoxDark : ""}`}
+                      style={job.logoBackground ? { background: job.logoBackground, borderColor: job.logoBackground } : undefined}
+                    >
                       <Image src={job.logo} alt={`${job.company} logo`} width={30} height={30} />
                     </div>
                     <span className={styles.roleDates}>{job.dates}</span>
@@ -176,7 +205,13 @@ export default function Home() {
                   <div>
                     <h4 className={styles.roleTitle}>{job.role}</h4>
                     <p className={styles.roleCompany}>
-                      {job.company}
+                      {job.href ? (
+                        <a href={job.href} target="_blank" rel="noreferrer" className={styles.companyLink}>
+                          {job.company} <span aria-hidden="true">↗</span>
+                        </a>
+                      ) : (
+                        job.company
+                      )}
                       {job.badge && <span className={styles.badge}>{job.badge}</span>}
                     </p>
                     <p className={styles.roleDomain}>{job.domain}</p>

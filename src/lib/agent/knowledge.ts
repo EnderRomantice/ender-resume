@@ -37,6 +37,7 @@ const PERSONAL_TOPICS = [
   "游戏", "minecraft", "rimworld", "暗黑地牢", "游戏王",
   "文学", "读书", "书", "写作", "随笔", "江户川乱步", "陀思妥耶夫斯基", "尼采", "地下室手记", "查拉图斯特拉",
   "音乐", "摇滚", "爵士", "乐队", "周二下午谁没来", "水仙斗活佛", "sons of 1973", "七七连环杀人调", "第四章第三曲", "逝水流年调",
+  "wayline", "创业", "联合创始人", "co-founder", "cofounder",
   "开源", "react bits", "reactbits", "贡献者", "开发组合", "开发工具", "herdr", "pi coding", "deepseek", "codex",
   "who are you", "about you", "your name", "where are you from", "where do you live",
   "birthday", "born", "age", "zodiac", "height", "weight", "hair", "fashion", "style",

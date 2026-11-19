@@ -10,3 +10,4 @@ Current documents:
 - `work-experience-01.md` — 42 / AI-native team workflow and multi-agent infrastructure
 - `work-experience-02.md` — Creatorone / TikTok Shop AI creator-marketing platform
 - `work-experience-03.md` — XTrace / cross-agent AI memory platform
+- `work-experience-04.md` — Wayline / co-founder, operational workflow systems

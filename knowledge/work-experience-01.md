@@ -2,13 +2,13 @@
 id: work-experience-01
 title: 42 工作经历
 company: 42
-period: 2026.08-至今
+period: 2026.08-2026.11
 topics: Multi-Agent Collaboration, Agent Runtime, Execution Reliability, Recruiting Agent, AI Hardware, Accessibility
 ---
 
 # 公司与方向
 
-42 是一家聚焦视障辅助、宠物智能与阿尔茨海默照护赛道的 AI 硬件初创公司。这段工作为 Beijing · Remote；我负责全栈开发与产品交付，重点是让 Agent 参与可交互的长任务协作、为工具执行补齐可靠性机制，以及将招聘判断接入有依据、可核查的业务流程。
+42 是一家聚焦视障辅助、宠物智能与阿尔茨海默照护赛道的 AI 硬件初创公司。这段工作为 Beijing · Remote，时间是 2026 年 8 月至 2026 年 11 月，目前已结束；当时我负责全栈开发与产品交付，重点是让 Agent 参与可交互的长任务协作、为工具执行补齐可靠性机制，以及将招聘判断接入有依据、可核查的业务流程。
 
 # 我的角色
 
